@@ -6,7 +6,7 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load("PhysicsTools.TagAndProbe.Electron_TagProbeEDMAnalysis_cfi")
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:test_EDM_ntuple.root')
+    fileNames = cms.untracked.vstring('file:tp_EDM_ntuple.root')
 )
 
 process.maxEvents = cms.untracked.PSet(
