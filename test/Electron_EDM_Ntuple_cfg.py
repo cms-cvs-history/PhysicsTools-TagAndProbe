@@ -9,12 +9,19 @@ process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Geometry.CaloEventSetup.CaloGeometry_cfi")
 process.load("Geometry.CaloEventSetup.CaloTopology_cfi")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = cms.string('IDEAL_V9::All')
+#process.GlobalTag.globaltag = cms.string('IDEAL_V11::All')
+#process.GlobalTag.globaltag = cms.string('CRAFT_30X::All')
+#process.GlobalTag.globaltag = 'IDEAL_30X::All'
+#process.GlobalTag.globaltag = "STARTUP_V7::All"
+process.GlobalTag.globaltag = cms.string('MC_31X_V3::All')
 process.load("PhysicsTools.TagAndProbe.tag_probe_electron_cfi")
 
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring()
+    fileNames = cms.untracked.vstring(       '/store/relval/CMSSW_3_2_2/RelValZEE/GEN-SIM-RECO/MC_31X_V3-v1/0001/E047DC4C-4778-DE11-931F-001731A28857.root',
+       '/store/relval/CMSSW_3_2_2/RelValZEE/GEN-SIM-RECO/MC_31X_V3-v1/0001/B8A15208-7578-DE11-9F87-0018F3D0969A.root',
+       '/store/relval/CMSSW_3_2_2/RelValZEE/GEN-SIM-RECO/MC_31X_V3-v1/0001/3CD39E8C-4478-DE11-9BA1-0018F3D0961E.root'
+)
 )
 
 process.maxEvents = cms.untracked.PSet(
@@ -59,7 +66,7 @@ process.TPEdm = cms.EDProducer("TagProbeEDMNtuple",
 process.outpath = cms.OutputModule("PoolOutputModule",
     outputCommands = cms.untracked.vstring('drop *', 
         'keep *_TPEdm_*_*'),
-    fileName = cms.untracked.string('tp_EDM_ntuple_Summer08_IDEAL_V9.root')
+    fileName = cms.untracked.string('tp_EDM_ntuple.root')
 )
 
 process.p1 = cms.Path(process.lepton_cands+process.TPEdm)
