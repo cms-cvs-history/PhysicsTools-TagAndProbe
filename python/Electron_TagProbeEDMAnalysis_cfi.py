@@ -3,23 +3,28 @@ import FWCore.ParameterSet.Config as cms
 demo = cms.EDAnalyzer("TagProbeEDMAnalysis",
     # Efficiency/Fitting variables
     CalculateEffSideBand = cms.untracked.bool(True),
-    NameVar2 = cms.untracked.string('eta'),
+    CalculateEffFitter = cms.untracked.bool(True), ## effs from Roofit
+    UnbinnedFit = cms.untracked.bool(True),                      
     # Variables for sideband subtraction
     SBSPeak = cms.untracked.double(91.1876),
     # Variable Specifications for SB subtractions and Roofit
     # Choose binned or unbinned fitter ...
     # Note that the unbinned fit will not fit weighted data,
     # if you wish to use weights, use the binned fit.
-    UnbinnedFit = cms.untracked.bool(True),
     # Variables and binning for the eff hists
     # Valid variables names for the eff binning are:
     # "pt","p","px","py","pz","e","et","eta" and "phi"
     # This way of declaring the bin will overide any other
     # If omitted the defaults are var1 = pt and var2 = eta
-    NameVar1 = cms.untracked.string('phi'),
+    NameVar1 = cms.untracked.string('pt'),
+    NumBinsVar1 = cms.untracked.int32(4),
+    Var1Low = cms.untracked.double(20.0),                   
+    Var1High = cms.untracked.double(100.0),
+    NameVar2 = cms.untracked.string('eta'),                      
+    NumBinsVar2 = cms.untracked.int32(5),
+    Var2Low = cms.untracked.double(-2.5),
+    Var2High = cms.untracked.double(2.5),                      
     NumBkgPass = cms.untracked.vdouble(1000.0, 0.0, 10000.0),
-    NumBinsVar1 = cms.untracked.int32(28),
-    NumBinsVar2 = cms.untracked.int32(30),
     # There is also an option to read the variables in 
     # via a file. This allows for much greater binning flexability
     # 
@@ -31,15 +36,15 @@ demo = cms.EDAnalyzer("TagProbeEDMAnalysis",
     BkgPeak = cms.untracked.vdouble(91.1876),
     # Binning for the above plots 
     XBins = cms.untracked.vuint32(100),
-    SignalWidth = cms.untracked.vdouble(2.8),
-    MassLow = cms.untracked.double(80.0),
+    SignalWidth = cms.untracked.vdouble(2.8),                      
     SBSStanDev = cms.untracked.double(2.0), ## SD from peak for subtraction
-
     # Mass window for fitting
     # untracked int32 NumBinsMass         = 60
     # untracked double MassLow            = 60.0
     # untracked double MassHigh           = 120.0
     NumBinsMass = cms.untracked.int32(20),
+    MassLow = cms.untracked.double(80.0),
+    MassHigh = cms.untracked.double(100.0),                      
     logY = cms.untracked.vuint32(1),
     # Efficiency variables
     Efficiency = cms.untracked.vdouble(0.9, 0.0, 1.0),
@@ -47,13 +52,9 @@ demo = cms.EDAnalyzer("TagProbeEDMAnalysis",
     Do2DFit = cms.untracked.bool(True),
     XMax = cms.untracked.vdouble(120.0),
     outputFileNames = cms.untracked.vstring('Zmass_pass.eps'),
-    CalculateEffFitter = cms.untracked.bool(True), ## effs from Roofit
-
     SignalSigma = cms.untracked.vdouble(1.1, 0.5, 4.0),
     # Make some plots of tree variables ...
     quantities = cms.untracked.vstring('TPmass'),
-    Var2High = cms.untracked.double(3.0),
-    MassHigh = cms.untracked.double(100.0),
     BifurGaussFrac = cms.untracked.vdouble(0.2, 0.01, 0.99),
     useRecoVarsForTruthMatchedCands = cms.untracked.bool(False),
     # Type of Efficiency : 0 => SC-->GsfElectron
@@ -67,17 +68,13 @@ demo = cms.EDAnalyzer("TagProbeEDMAnalysis",
     # If the variable should be fixed, fill one element {value}
     # Signal variables
     SignalMean = cms.untracked.vdouble(91.1876),
-    XMin = cms.untracked.vdouble(50.0),
-    Var1High = cms.untracked.double(3.5),
+    XMin = cms.untracked.vdouble(60.0),
     NumBkgFail = cms.untracked.vdouble(10.0, 0.0, 10000.0),
     BkgBeta = cms.untracked.vdouble(0.001, 0.0, 0.1),
     conditions = cms.untracked.vstring('TPppass==1'),
     SignalWidthL = cms.untracked.vdouble(3.0, 0.0, 20.0),
     SignalWidthR = cms.untracked.vdouble(0.52, 0.0, 10.0),
-    Var2Low = cms.untracked.double(-3.0),
-    Var1Low = cms.untracked.double(-3.5),
     CalculateEffTruth = cms.untracked.bool(False), ## true effs
-
     NumSignal = cms.untracked.vdouble(4000.0, 0.0, 100000.0)
 )
 
