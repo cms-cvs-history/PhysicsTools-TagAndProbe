@@ -146,7 +146,7 @@ void GenericElectronSelection::produce(edm::Event &event, const edm::EventSetup 
   // --------------------------------------------
 
 
-   int index =0, eClass = -1;
+   int index =0, eClass = 2;
    double elecEta=10.0, elecPhi=10.0, elecE=-1.0, elecEt=-1.0, 
      deltaEta=10.0, deltaPhi=10.0, sigmaEtaEta=10.0;
    double tkIsolation = 100.0, ecalIsolation = 100.0, hcalIsolation = 100.0;
@@ -201,7 +201,10 @@ void GenericElectronSelection::produce(edm::Event &event, const edm::EventSetup 
 
 
      // ------ analysis cuts -----------------
-     eClass = electronRef->classification();
+     eClass = 2;
+     if(electronRef->isEB()) eClass = 0;
+     else if(electronRef->isEE()) eClass = 1;
+
      cutresult = cutDecision ( eClass, deltaEta, deltaPhi, sigmaEtaEta, 
 			       tkIsolation, ecalIsolation, hcalIsolation);
 
@@ -285,10 +288,12 @@ bool GenericElectronSelection::cutDecision ( int classification, double deta,
 				  double dphi, double sietaeta, double tkiso,
 				  double ecaliso, double hcaliso) {
 
+
+
   double deltaEtaCut_, deltaPhiCut_, sigmaEtaEtaCut_, 
     tkIsoCut_, ecalIsoCut_, hcalIsoCut_;
 
-  if( classification < 100 ) {  // barrel
+  if( classification ==0 ) {  // barrel
     deltaEtaCut_      = deltaEtaCutBarrel_;
     deltaPhiCut_      = deltaPhiCutBarrel_;
     sigmaEtaEtaCut_   = sigmaEtaEtaCutBarrel_;
@@ -296,7 +301,7 @@ bool GenericElectronSelection::cutDecision ( int classification, double deta,
     ecalIsoCut_       = ecalIsoCutBarrel_;
     hcalIsoCut_       = hcalIsoCutBarrel_;
   }
-  else {
+  else if( classification == 1 ) {
     deltaEtaCut_     = deltaEtaCutEndcaps_;
     deltaPhiCut_     = deltaPhiCutEndcaps_;
     sigmaEtaEtaCut_  = sigmaEtaEtaCutEndcaps_;

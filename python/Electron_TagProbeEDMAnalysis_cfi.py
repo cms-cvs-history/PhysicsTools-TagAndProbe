@@ -74,7 +74,7 @@ demo = cms.EDAnalyzer("TagProbeEDMAnalysis",
     conditions = cms.untracked.vstring('TPppass==1'),
     SignalWidthL = cms.untracked.vdouble(3.0, 0.0, 20.0),
     SignalWidthR = cms.untracked.vdouble(0.52, 0.0, 10.0),
-    CalculateEffTruth = cms.untracked.bool(False), ## true effs
+    CalculateEffTruth = cms.untracked.bool(True), ## true effs
     NumSignal = cms.untracked.vdouble(4000.0, 0.0, 100000.0)
 )
 
