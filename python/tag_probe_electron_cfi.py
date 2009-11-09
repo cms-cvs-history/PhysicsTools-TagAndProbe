@@ -155,10 +155,9 @@ theId = cms.EDProducer("eidCandProducer",
 
 
 # Trigger  ##################
-theHLT = cms.EDProducer("eTriggerCandProducer",
+theHLT = cms.EDProducer("eTriggerGsfElectronCollection",
     InputProducer = cms.InputTag('theId'),
-    hltTag = cms.untracked.InputTag("hltL1NonIsoHLTNonIsoSingleElectronEt15LTITrackIsolFilter","","HLT")
-    #hltTag = cms.untracked.InputTag("hltL1NonIsoHLTLooseIsoSingleElectronLWEt15TrackIsolFilter","","HLT")
+    hltTag = cms.untracked.InputTag("HLT_Ele15_LW_L1R","","HLT8E29")
 )
 
 electron_sequence = cms.Sequence(theGsfElectrons * eleIsoDepositTk *

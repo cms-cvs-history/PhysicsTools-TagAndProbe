@@ -11,7 +11,6 @@ process.load("Geometry.CaloEventSetup.CaloTopology_cfi")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 #process.GlobalTag.globaltag = cms.string('IDEAL_V11::All')
 #process.GlobalTag.globaltag = cms.string('CRAFT_30X::All')
-#process.GlobalTag.globaltag = 'IDEAL_30X::All'
 #process.GlobalTag.globaltag = "STARTUP_V7::All"
 process.GlobalTag.globaltag = cms.string('MC_31X_V3::All')
 process.load("PhysicsTools.TagAndProbe.tag_probe_electron_cfi")
@@ -57,15 +56,24 @@ process.TPEdm = cms.EDProducer("TagProbeEDMNtuple",
     passProbeCandTags = cms.untracked.VInputTag(cms.InputTag("theGsfElectrons"), cms.InputTag("theIsolation"), cms.InputTag("theId"), cms.InputTag("theHLT"), cms.InputTag("HFElectronID")),
     verticesTag = cms.untracked.InputTag("offlinePrimaryVertices"),
     mcParents = cms.untracked.vint32(0, 0, 0),
-    BestProbeCriteria = cms.untracked.vstring("Random6","OneProbe","OneProbe","OneProbe","Random2"),
-    BestProbeInvMass  = cms.untracked.vdouble(91.1876,91.1876,91.1876,91.1876,91.1876)
+    BestProbeCriteria = cms.untracked.vstring("Random6","Random6","Random6","Random6","Random6")
 )
+
+
+# Only keep events where a Tag-Probe pair was found (useful for background)
+process.TPFilter = cms.EDFilter("TagProbeEDMFilter")
+
+process.p1 = cms.Path( process.lepton_cands*process.TPEdm*process.TPFilter )
 
 process.outpath = cms.OutputModule("PoolOutputModule",
-    outputCommands = cms.untracked.vstring('drop *', 
-        'keep *_TPEdm_*_*'),
-    fileName = cms.untracked.string('demo.root')
+    fileName = cms.untracked.string("demo.root"),
+    outputCommands = cms.untracked.vstring(
+	  "drop *",
+	  "keep *_TPEdm_*_*" 
+    ),
+    SelectEvents = cms.untracked.PSet(
+        SelectEvents = cms.vstring('p1')
+    )
 )
-
-process.p1 = cms.Path(process.lepton_cands+process.TPEdm)
-process.the_end = cms.EndPath(process.outpath)
+    
+process.the_end = cms.EndPath( process.outpath )

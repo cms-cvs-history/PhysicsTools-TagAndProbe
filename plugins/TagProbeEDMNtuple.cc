@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Mon May  5 08:47:29 CDT 2008
-// $Id: TagProbeEDMNtuple.cc,v 1.14 2009/05/27 12:39:42 ahunt Exp $
+// $Id: TagProbeEDMNtuple.cc,v 1.15 2009/06/22 21:39:18 ahunt Exp $
 //
 //
 // Kalanand Mishra: October 7, 2008 
@@ -77,7 +77,7 @@ TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
 
 
    // ********** Calo Jets ********** //
-   jetTags_ = iConfig.getUntrackedParameter<std::string>("jets","iterativeCone5CaloJets");
+   jetTags_ = iConfig.getUntrackedParameter<std::string>("jets","");
 
    // ********************************* //
 
@@ -745,8 +745,8 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 	    // Is this Tag-Probe pair from a true Z?
 	    // See if both the daughters are matched.
 	    int tptrue = 0;
- 	    bool tagFromZ   = CandFromZ((*tagmatch)[tag]);
- 	    bool probeFromZ = CandFromZ((*allprobematch)[vprobes[probenum].first]);
+ 	    bool tagFromZ   = isMC_ ? CandFromZ((*tagmatch)[tag]): false;
+ 	    bool probeFromZ = isMC_ ? CandFromZ((*allprobematch)[vprobes[probenum].first]) : false;
 
 	    // If both tag and probe are from Z .. set to true
 	    if( tagFromZ && probeFromZ ) tptrue = 1;
@@ -917,14 +917,16 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 	    tp_probe_phiDet_->push_back(  dphi );
 
 	    // Now look for deltaR between tag & nearest CaloJet
-	    edm::Handle<reco::CaloJetCollection> jetsColl;
-	    if ( !m_event->getByLabel(jetTags_, jetsColl) ) {
-	      edm::LogWarning("Z") << "Could not extract jet with input tag " << jetTags_;
+	    // but only if jets are enabled
+	    double totaljets = 0.;
+            double dRjet_probe_min = 99.;
+            if ( !jetTags_.empty() ) {
+	      edm::Handle<reco::CaloJetCollection> jetsColl;
+	      if ( !m_event->getByLabel(jetTags_, jetsColl) ) {
+		edm::LogWarning("Z") << "Could not extract jet with input tag " << jetTags_;}
 	      if ( !jetsColl->size() == 0){
-		double totaljets = 0.;
-		double dRjet_probe_min = 99.;
 		int iCounter = 0;
-		for ( reco::CaloJetCollection::const_iterator jet = jetsColl->begin(); 
+		for (reco::CaloJetCollection::const_iterator jet = jetsColl->begin(); 
 		     jet != jetsColl->end(); ++jet) {
 		  ++iCounter;
 		  if (jet->et() < 0.5 ) continue ;
@@ -935,11 +937,12 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 		  }
 		  ++totaljets;
 		}
-		tp_probe_jetDeltaR_->push_back(  dRjet_probe_min );
-		tp_probe_totJets_->push_back(  totaljets);}
-	    }  
-	    ++nrtp;
-	 }
+	      }
+            }
+            tp_probe_jetDeltaR_->push_back(  dRjet_probe_min );
+            tp_probe_totJets_->push_back(  totaljets);
+	 }	 
+	 ++nrtp;
       }
    }
    nrtp_.reset( new int(nrtp) );

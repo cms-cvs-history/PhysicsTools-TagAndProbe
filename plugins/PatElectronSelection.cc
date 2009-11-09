@@ -243,8 +243,13 @@ bool PatElectronSelection::cutDecision ( int classification, double deta,
 				  double dphi, double sietaeta, double tkiso,
 				  double ecaliso, double hcaliso) {
 
-  double deltaEtaCut_, deltaPhiCut_, sigmaEtaEtaCut_, 
-    tkIsoCut_, ecalIsoCut_, hcalIsoCut_;
+  // Initialize to "no cuts" values
+    double deltaEtaCut_      =  100000.0;
+    double deltaPhiCut_      =  100000.0;
+    double sigmaEtaEtaCut_   =  100000.0;
+    double tkIsoCut_         =  100000.0;
+    double ecalIsoCut_       =  100000.0;
+    double hcalIsoCut_       =  100000.0;
 
   if( classification ==0 ) {  // barrel
     deltaEtaCut_      = deltaEtaCutBarrel_;

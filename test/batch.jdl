@@ -1,0 +1,10 @@
+universe = vanilla
+Executable = condor.sh
+should_transfer_files = YES
+WhenTOTransferOutput  = ON_EXIT
+Output = /uscms/home/kalanand/cms/electron/efficiency/CMSSW_3_1_4/src/PhysicsTools/TagAndProbe/test/batch_$(cluster)_$(process).stdout
+Error  = /uscms/home/kalanand/cms/electron/efficiency/CMSSW_3_1_4/src/PhysicsTools/TagAndProbe/test/batch_$(cluster)_$(process).stderr
+Log    = /uscms/home/kalanand/cms/electron/efficiency/CMSSW_3_1_4/src/PhysicsTools/TagAndProbe/test/batch_$(cluster)_$(process).condor
+Requirements          = (Memory >= 499 && OpSys == "LINUX" && (Arch != "DUMMY"))
+Arguments = $(cluster) $(process) /uscms/home/kalanand/cms/electron/efficiency/CMSSW_3_1_4/ /uscms/home/kalanand/cms/electron/efficiency/CMSSW_3_1_4/src/PhysicsTools/TagAndProbe/test Electron_TagProbe_Analysis_cfg_cond.py 
+Queue 4

@@ -1,5 +1,5 @@
-#ifndef PhysicsTools_TagAndProbe_eTriggerCandProducer_h
-#define PhysicsTools_TagAndProbe_eTriggerCandProducer_h
+#ifndef PhysicsTools_TagAndProbe_TriggerCandProducer_h
+#define PhysicsTools_TagAndProbe_TriggerCandProducer_h
 
 // system include files
 #include <memory>
@@ -9,15 +9,15 @@
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
+#include "DataFormats/Candidate/interface/ShallowCloneCandidate.h"
 
 // forward declarations
-
-class eTriggerCandProducer : public edm::EDProducer 
+template<typename C>
+class TriggerCandProducer : public edm::EDProducer 
 {
  public:
-  explicit eTriggerCandProducer(const edm::ParameterSet&);
-  ~eTriggerCandProducer();
+  explicit TriggerCandProducer(const edm::ParameterSet&);
+  ~TriggerCandProducer();
 
  private:
   virtual void beginJob() ;
@@ -31,7 +31,6 @@ class eTriggerCandProducer : public edm::EDProducer
   edm::InputTag hltTag_;
   double delRMatchingCut_;
 
-
 };
-
+#include "PhysicsTools/TagAndProbe//src/TriggerCandProducer.icc"
 #endif

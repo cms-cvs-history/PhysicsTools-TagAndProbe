@@ -4,7 +4,7 @@
 //
 // Original Author: Nadia Adam (Princeton University) 
 //         Created:  Fri May 16 16:48:24 CEST 2008
-// $Id: TagProbeEDMAnalysis.h,v 1.10 2009/02/17 17:27:49 haupt Exp $
+// $Id: TagProbeEDMAnalysis.h,v 1.11 2009/03/24 19:32:37 ahunt Exp $
 //
 //
 // Kalanand Mishra: July 1, 2008 
@@ -100,7 +100,7 @@ class TagProbeEDMAnalysis : public edm::EDAnalyzer
       void makeBkgPdf();
       void doFit( std::string &bvar1, std::vector< double > bins1, int bin1, 
 		  std::string &bvar2, std::vector<double> bins2, int bin2, 
-                  double &eff, double &err, bool is2D = false );
+                  double &eff, double &err, bool is2D = false, bool floatShapeParameters = false );
 
 
 
@@ -137,6 +137,7 @@ class TagProbeEDMAnalysis : public edm::EDAnalyzer
       bool unbinnedFit_;        // Do a binned/unbinned fit
       bool do2DFit_;            // Do the 2D fit as well
       bool useRecoVarsForTruthMatchedCands_; // use reco vars for calcEffsTruth
+      bool floatAllShapeParameters_; // make all signal shape parameters floating in the fit
 
       int massNbins_;           // Number of bins in the fit
       double massLow_;          // Lower bound for fit range
