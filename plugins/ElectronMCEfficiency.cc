@@ -290,6 +290,16 @@ void ElectronMCEfficiency::analyze(const edm::Event& iEvent,
   probeVy            = -10.;
   probeVz            = -10.;   
 
+  probe_trackiso = 99999.;
+  probe_ecaliso  = 99999.;
+  probe_hcaliso  =  99999.;
+  probe_SCEta        = -10.;
+  probe_SCE          = -1.;
+  probe_SCEt         = -1.;
+  probe_deltaEta     = -1.;
+  probe_deltaPhi     = -1.;
+  probe_sigmaEtaEta  = -1.;
+
   isInAcceptance     = false;
   isSuperCluster     = false;
   isGsfElectron      = false;
@@ -328,7 +338,7 @@ void ElectronMCEfficiency::analyze(const edm::Event& iEvent,
     for(size_t j = 0; j < ndau; ++ j) {
       const reco::Candidate *d = Res->daughter( j );
       if( d==0 ) continue;
-      if( ! abs(d->pdgId()) == 11 ) continue;
+      if( ! (abs(d->pdgId()) == 11) ) continue;
 
       isInAcceptance = CheckAcceptance(iEvent, *d);
       isSuperCluster = CheckSuperClusterMatch( iEvent, *d);
@@ -460,6 +470,18 @@ void ElectronMCEfficiency::boolResults( const edm::Event& iEvent,
       isPassWoff = passW;
       isPassZoff = passZ;
       break;
+    }
+    else {
+      probe_trackiso = 99999.;
+      probe_ecaliso  = 99999.;
+      probe_hcaliso  =  99999.;
+      probe_SCEta        = -10.;
+      probe_SCE          = -1.;
+      probe_SCEt         = -1.;
+      probe_deltaEta     = -1.;
+      probe_deltaPhi     = -1.;
+      probe_sigmaEtaEta  = -1.;
+
     }		
 
     ++index;
@@ -473,15 +495,15 @@ void ElectronMCEfficiency::boolResults( const edm::Event& iEvent,
 
 // --------------- apply analysis cuts here --------------------
 // classification: 0 == barrel, 1 == endcaps
-// WZ:             0 == W, 1 == endcaps
+// WZ:             0 == W, 1 == Z
 
 bool ElectronMCEfficiency::cutDecision ( int WZ, int classification, 
 					 double pt, double deta, 
 					 double dphi, double sietaeta, double tkiso,
 					 double ecaliso, double hcaliso) {
   
-  double ptCut_=20.0, deltaEtaCut_=0.5, deltaPhiCut_=0.5, 
-    sigmaEtaEtaCut_=0.5, tkIsoCut_=10000.0, ecalIsoCut_=10000.0, 
+  double ptCut_=20.0, deltaEtaCut_=1.0, deltaPhiCut_=1.0, 
+    sigmaEtaEtaCut_=1.0, tkIsoCut_=10000.0, ecalIsoCut_=10000.0, 
     hcalIsoCut_=10000.0;
 
 
