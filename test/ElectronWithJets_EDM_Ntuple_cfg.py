@@ -65,7 +65,7 @@ process.TPEdm = cms.EDProducer("TagProbeEDMNtuple",
     # in case we want it
     mcParticles = cms.untracked.vint32(23, 11, 22),
     trackTags = cms.untracked.VInputTag(cms.InputTag("generalTracks")),
-    jets = cms.untracked.string("antikt5CaloJetsCor"),                          
+    jets = cms.untracked.string("antikt5CaloJetsClean"),                          
     # Pass Probe Electron Candidate Collections
     passProbeCandTags = cms.untracked.VInputTag(cms.InputTag("theGsfElectrons"), cms.InputTag("theIsolation"), cms.InputTag("theId"), cms.InputTag("theHLT"), cms.InputTag("HFElectronID")),
     verticesTag = cms.untracked.InputTag("offlinePrimaryVertices"),
