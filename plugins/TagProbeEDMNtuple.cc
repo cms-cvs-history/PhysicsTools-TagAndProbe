@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Mon May  5 08:47:29 CDT 2008
-// $Id: TagProbeEDMNtuple.cc,v 1.15 2009/06/22 21:39:18 ahunt Exp $
+// $Id: TagProbeEDMNtuple.cc,v 1.15.8.1 2009/11/09 02:11:47 kalanand Exp $
 //
 //
 // Kalanand Mishra: October 7, 2008 
@@ -26,7 +26,7 @@
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
-#include "DataFormats/JetReco/interface/CaloJetCollection.h"
+#include "DataFormats/JetReco/interface/JetCollection.h"
 #include "DataFormats/RecoCandidate/interface/RecoCandidate.h"
 
 #include "FWCore/Framework/interface/MakerMacros.h"
@@ -916,20 +916,21 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 	    tp_probe_etaDet_->push_back(  deta );
 	    tp_probe_phiDet_->push_back(  dphi );
 
-	    // Now look for deltaR between tag & nearest CaloJet
+	    // Now look for deltaR between probe & nearest jet
 	    // but only if jets are enabled
 	    double totaljets = 0.;
             double dRjet_probe_min = 99.;
             if ( !jetTags_.empty() ) {
-	      edm::Handle<reco::CaloJetCollection> jetsColl;
+	      
+	      edm::Handle<edm::View<reco::Jet> > jetsColl;
 	      if ( !m_event->getByLabel(jetTags_, jetsColl) ) {
 		edm::LogWarning("Z") << "Could not extract jet with input tag " << jetTags_;}
 	      if ( !jetsColl->size() == 0){
 		int iCounter = 0;
-		for (reco::CaloJetCollection::const_iterator jet = jetsColl->begin(); 
-		     jet != jetsColl->end(); ++jet) {
+
+		for(edm::View<reco::Jet>::const_iterator  
+		      jet = jetsColl->begin(); jet != jetsColl->end();++jet) {
 		  ++iCounter;
-		  if (jet->et() < 0.5 ) continue ;
 		  double dRjet_probe = deltaR(deta, dphi, jet->eta(), jet->phi());
 		  if(iCounter == 1) dRjet_probe_min = dRjet_probe;
 		  if (dRjet_probe < dRjet_probe_min) {
@@ -937,6 +938,10 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 		  }
 		  ++totaljets;
 		}
+	      }
+	      else {
+		totaljets = 0.;
+		dRjet_probe_min = 99.;
 	      }
             }
             tp_probe_jetDeltaR_->push_back(  dRjet_probe_min );

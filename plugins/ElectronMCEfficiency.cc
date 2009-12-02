@@ -58,7 +58,7 @@ class ElectronMCEfficiency : public edm::EDAnalyzer
 
   bool CheckTriggerMatch( edm::Handle<trigger::TriggerEvent>,double, double);
   bool CheckSuperClusterMatch( const edm::Event&, const reco::Candidate&);
-
+  void setDef(void);
 
   // ----------member data ---------------------------
 
@@ -112,6 +112,7 @@ class ElectronMCEfficiency : public edm::EDAnalyzer
   float probe_SCEta;
   float probe_SCE;
   float probe_SCEt;
+  float probe_SCPhi;
   float probe_deltaEta;
   float probe_deltaPhi;
   float probe_sigmaEtaEta;
@@ -224,6 +225,7 @@ ElectronMCEfficiency::~ElectronMCEfficiency()
     myTree->Branch("probe_SCEta",       &probe_SCEta,       "probe_SCEta/F");
     myTree->Branch("probe_SCE",         &probe_SCE,         "probe_SCE/F");
     myTree->Branch("probe_SCEt",        &probe_SCEt,        "probe_SCEt/F");
+    myTree->Branch("probe_SCPhi",       &probe_SCPhi,       "probe_SCPhi/F");
     myTree->Branch("probe_deltaEta",    &probe_deltaEta,    "probe_deltaEta/F");
     myTree->Branch("probe_deltaPhi",    &probe_deltaPhi,    "probe_deltaPhi/F");
     myTree->Branch("probe_sigmaiEtaiEta", &probe_sigmaEtaEta, "probe_sigmaEtaEta/F");
@@ -257,12 +259,7 @@ ElectronMCEfficiency::~ElectronMCEfficiency()
 
 
 
-
-
-
-
-void ElectronMCEfficiency::analyze(const edm::Event& iEvent, 
-				    const edm::EventSetup& iSetup) {
+void ElectronMCEfficiency::setDef(void){
 
   mRes               = -1.;
   Res_px             = -99999.;
@@ -296,6 +293,7 @@ void ElectronMCEfficiency::analyze(const edm::Event& iEvent,
   probe_SCEta        = -10.;
   probe_SCE          = -1.;
   probe_SCEt         = -1.;
+  probe_SCPhi        = -10;
   probe_deltaEta     = -1.;
   probe_deltaPhi     = -1.;
   probe_sigmaEtaEta  = -1.;
@@ -310,7 +308,17 @@ void ElectronMCEfficiency::analyze(const edm::Event& iEvent,
   isPassZoff         = false;
   isTriggered        = false;
   isPassWon          = false;
-  isPassZon          = false;
+  isPassZon          = false; 
+
+}
+
+
+
+void ElectronMCEfficiency::analyze(const edm::Event& iEvent, 
+				    const edm::EventSetup& iSetup) {
+
+
+  setDef();
 
   edm::Handle<reco::GenParticleCollection> genParticles;
   iEvent.getByLabel("genParticles", genParticles);
@@ -334,8 +342,32 @@ void ElectronMCEfficiency::analyze(const edm::Event& iEvent,
     if(!(Res==0)) ndau = Res->numberOfDaughters();
     if( ndau<1 || !isFromResDecay(Res->pdgId()) ) continue;
 
+    /*
+     ////////////////////////////////////////////////////////
+    ///////////// make empty entry in-between every event ///
+     ////////////////////////////////////////////////////////
 
+    bool allInAcc = true;
     for(size_t j = 0; j < ndau; ++ j) {
+      const reco::Candidate *d = Res->daughter( j );
+      if( d==0 ) continue;
+      if( !(abs(d->pdgId()) == 11) ) continue;
+      //std::cout << "pdgId " << d->pdgId() << std::endl;
+      isInAcceptance = CheckAcceptance(iEvent, *d);
+      if(!isInAcceptance) allInAcc=false;
+    } 
+    if(!allInAcc) continue;
+    else {
+      isSuperCluster=false;
+      myTree->Fill();
+    }
+   ////////////////////////////////////////////////////////////
+    */
+ 
+    for(size_t j = 0; j < ndau; ++ j) {
+
+      setDef();
+
       const reco::Candidate *d = Res->daughter( j );
       if( d==0 ) continue;
       if( ! (abs(d->pdgId()) == 11) ) continue;
@@ -442,28 +474,43 @@ void ElectronMCEfficiency::boolResults( const edm::Event& iEvent,
     // ---------- dPhi, dEta, sigmaEtaEta -------------
     reco::SuperClusterRef sc = elec->superCluster();
     std::vector<float> vCov2 = lazyTools.localCovariances(*(sc->seed()));
-    probe_SCEta = sc.get()->eta();
-    probe_SCE   = sc.get()->energy();
-    probe_SCEt  = probe_SCE / cosh(probe_SCEta);
-    probe_deltaEta  = elec->deltaEtaSuperClusterTrackAtVtx();
-    probe_deltaPhi  = elec->deltaPhiSuperClusterTrackAtVtx();
-    probe_sigmaEtaEta  = sqrt(vCov2[0]);
+
+    float probe_SCEta1, probe_SCE1, probe_SCEt1, probe_SCPhi1, 
+      probe_deltaEta1, probe_deltaPhi1, probe_sigmaEtaEta1;
+
+ 
+    probe_SCEta1 = sc.get()->eta();
+    probe_SCE1   = sc.get()->energy();
+    probe_SCEt1  = probe_SCE1 / cosh(probe_SCEta1);
+    probe_SCPhi1 = sc.get()->phi();
+    //std::cout << "phi() " << sc.get()->phi() << std::endl;
+    probe_deltaEta1  = elec->deltaEtaSuperClusterTrackAtVtx();
+    probe_deltaPhi1  = elec->deltaPhiSuperClusterTrackAtVtx();
+    probe_sigmaEtaEta1  = sqrt(vCov2[0]);
 
 
     int eClass = 2;
     if(electronRef->isEB()) eClass = 0;
     else if(electronRef->isEE()) eClass = 1;
 
-    bool passW = cutDecision ( 0, eClass, probe_SCEt, probe_deltaEta, 
-			       probe_deltaPhi, probe_sigmaEtaEta, probe_trackiso,
+    bool passW = cutDecision ( 0, eClass, probe_SCEt1, probe_deltaEta1, 
+			       probe_deltaPhi1, probe_sigmaEtaEta1, probe_trackiso,
 			       probe_ecaliso, probe_hcaliso);
 
-    bool passZ = cutDecision ( 1, eClass, probe_SCEt, probe_deltaEta, 
-			       probe_deltaPhi, probe_sigmaEtaEta, probe_trackiso,
+    bool passZ = cutDecision ( 1, eClass, probe_SCEt1, probe_deltaEta1, 
+			       probe_deltaPhi1, probe_sigmaEtaEta1, probe_trackiso,
 			       probe_ecaliso, probe_hcaliso);
 
     if( overlap( *x, ele) ) {
       isGsfElectron = true;
+      probe_SCEta=probe_SCEta1;
+      probe_SCE=probe_SCE1;
+      probe_SCEt=probe_SCEt1;
+      probe_SCPhi=probe_SCPhi1;
+      probe_deltaEta=probe_deltaEta1;
+      probe_deltaPhi=probe_deltaPhi1;
+      probe_sigmaEtaEta=probe_sigmaEtaEta1;
+
       if( probe_trackiso / probe_SCEt < 0.2) isIsolated = true;
       if( electronIdLoose > 0.0 ) isRobustLoose = true;
       if( electronIdTight > 0.0 ) isRobustTight = true;
@@ -471,19 +518,7 @@ void ElectronMCEfficiency::boolResults( const edm::Event& iEvent,
       isPassZoff = passZ;
       break;
     }
-    else {
-      probe_trackiso = 99999.;
-      probe_ecaliso  = 99999.;
-      probe_hcaliso  =  99999.;
-      probe_SCEta        = -10.;
-      probe_SCE          = -1.;
-      probe_SCEt         = -1.;
-      probe_deltaEta     = -1.;
-      probe_deltaPhi     = -1.;
-      probe_sigmaEtaEta  = -1.;
-
-    }		
-
+    
     ++index;
   }
 
@@ -533,7 +568,7 @@ bool ElectronMCEfficiency::cutDecision ( int WZ, int classification,
     ptCut_ = 20.0;
     if( classification ==0 ) {  // barrel
       deltaEtaCut_      = 0.0071;
-      deltaPhiCut_      = 0.5;
+      deltaPhiCut_      = 1.0;
       sigmaEtaEtaCut_   = 0.010;
       tkIsoCut_         = 7.2;
       ecalIsoCut_       = 5.7;
@@ -541,7 +576,7 @@ bool ElectronMCEfficiency::cutDecision ( int WZ, int classification,
     }
     else if( classification == 1 ) {
       deltaEtaCut_     = 0.0066;
-      deltaPhiCut_     = 0.5;
+      deltaPhiCut_     = 1.0;
       sigmaEtaEtaCut_  = 0.028;
       tkIsoCut_        = 5.1;
       ecalIsoCut_      = 5.0;
@@ -674,8 +709,17 @@ bool ElectronMCEfficiency::CheckSuperClusterMatch( const edm::Event& iEvent,
 
   for(edm::View<reco::Candidate>::const_iterator  
 	sc = SuperClusters->begin(); sc != SuperClusters->end();++sc) {
+    //probe_SCEt  = probe_SCE / cosh(probe_SCEta);
+    //  if( overlap( *sc, ele) && ( sc->energy()/cosh(sc->eta()) > ElectronPtCut_ ) ) {
 
-    if( overlap( *sc, ele) ) result = true; 
+    if( overlap( *sc, ele) ) {
+      result = true; 
+      probe_SCEta=sc->eta();
+      probe_SCE=sc->energy();
+      probe_SCEt=probe_SCE/cosh(probe_SCEta);
+      probe_SCPhi=sc->phi();
+      break;
+    }
   }
   return result; 
 }
