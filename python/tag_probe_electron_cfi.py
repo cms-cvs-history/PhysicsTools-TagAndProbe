@@ -3,9 +3,9 @@ import FWCore.ParameterSet.Config as cms
 # 
 #  GsfElectrons  ################
 # 
-from PhysicsTools.HepMCCandAlgos.genParticles_cfi import *
+#from PhysicsTools.HepMCCandAlgos.genParticles_cfi import *
 
-from RecoEgamma.EgammaHFProducers.hfEMClusteringSequence_cff import *
+#from RecoEgamma.EgammaHFProducers.hfEMClusteringSequence_cff import *
 
 from Geometry.CMSCommonData.cmsIdealGeometryXML_cff import *
 
@@ -19,15 +19,16 @@ from Configuration.EventContent.EventContent_cff import *
 #
 from RecoEgamma.EgammaIsolationAlgos.eleIsoFromDepsModules_cff import *
 from RecoEgamma.EgammaIsolationAlgos.eleIsoDepositTk_cff import *
+from RecoEgamma.EgammaIsolationAlgos.eleIsoDepositEcalFromHits_cff import *
+from RecoEgamma.EgammaIsolationAlgos.eleIsoDepositHcalFromTowers_cff import *
 
-
-hfRecoEcalCandidate.Correct = True
+#hfRecoEcalCandidate.Correct = True
 ##hfRecoEcalCandidate.e9e25Cut = 0
 ##hfRecoEcalCandidate.intercept2DCut = -99
 
-hfSuperClusterCandidate = hfRecoEcalCandidate.clone()
-hfSuperClusterCandidate.e9e25Cut = 0
-hfSuperClusterCandidate.intercept2DCut = -99
+#hfSuperClusterCandidate = hfRecoEcalCandidate.clone()
+#hfSuperClusterCandidate.e9e25Cut = 0
+#hfSuperClusterCandidate.intercept2DCut = -99
 
 # 
 #  Calculate efficiency for *SuperClusters passing as GsfElectron* 
@@ -105,8 +106,7 @@ theSuperClusters = cms.EDFilter("CandViewSelector",
 ###Old sequence to be used again when HF calibration is in the corrected SuperCluster Step.
 #sc_sequence = cms.Sequence( (HybridSuperClusters * EBSuperClusters + EndcapSuperClusters * EESuperClusters + HFSuperClusterCands * HFSuperClusters * theHFSuperClusters) *allSuperClusters * theSuperClusters)
 
-sc_sequence = cms.Sequence( (HybridSuperClusters * EBSuperClusters + EndcapSuperClusters * EESuperClusters + hfSuperClusterCandidate * theHFSuperClusters) *allSuperClusters * theSuperClusters)
-
+sc_sequence = cms.Sequence( (HybridSuperClusters * EBSuperClusters + EndcapSuperClusters * EESuperClusters) *allSuperClusters * theSuperClusters)
 
 
 
@@ -155,14 +155,21 @@ theId = cms.EDProducer("eidCandProducer",
 
 
 # Trigger  ##################
-theHLT = cms.EDProducer("eTriggerGsfElectronCollection",
+theHLT = cms.EDProducer("eTriggerCandProducer",
     InputProducer = cms.InputTag('theId'),
-    hltTag = cms.untracked.InputTag("HLT_Ele15_LW_L1R","","HLT8E29")
+    hltTag = cms.untracked.InputTag("hltL1NonIsoHLTNonIsoSingleElectronEt15LTITrackIsolFilter","","HLT"),
+    triggerEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD","","HLT")
 )
 
-electron_sequence = cms.Sequence(theGsfElectrons * eleIsoDepositTk *
-                                 eleIsoFromDepsTk * theIsolation *
-                                 eidRobust * theId * theHLT * HFElectronID )
+electron_sequence = cms.Sequence(theGsfElectrons*
+                                 eleIsoDepositTk*
+                                 eleIsoDepositEcalFromHits*
+                                 eleIsoFromDepsEcalFromHits*
+                                 eleIsoDepositHcalFromTowers*
+                                 eleIsoFromDepsHcalFromTowers*
+                                 eleIsoFromDepsTk*
+                                 theIsolation*
+                                 eidRobust * theId * theHLT )
 
 
 
@@ -179,30 +186,30 @@ electron_sequence = cms.Sequence(theGsfElectrons * eleIsoDepositTk *
 #
 
 tpMapSuperClusters = cms.EDProducer("TagProbeProducer",
-    MassMaxCut = cms.untracked.double(120.0),
+    MassMaxCut = cms.untracked.double(110.0),
     TagCollection = cms.InputTag("theHLT"),
-    MassMinCut = cms.untracked.double(60.0),
+    MassMinCut = cms.untracked.double(70.0),
     ProbeCollection = cms.InputTag("theSuperClusters")
 )
 
 tpMapGsfElectrons = cms.EDProducer("TagProbeProducer",
-    MassMaxCut = cms.untracked.double(120.0),
+    MassMaxCut = cms.untracked.double(110.0),
     TagCollection = cms.InputTag("theHLT"),
-    MassMinCut = cms.untracked.double(60.0),
+    MassMinCut = cms.untracked.double(70.0),
     ProbeCollection = cms.InputTag("theGsfElectrons")
 )
 
 tpMapIsolation = cms.EDProducer("TagProbeProducer",
-    MassMaxCut = cms.untracked.double(120.0),
+    MassMaxCut = cms.untracked.double(110.0),
     TagCollection = cms.InputTag("theHLT"),
-    MassMinCut = cms.untracked.double(60.0),
+    MassMinCut = cms.untracked.double(70.0),
     ProbeCollection = cms.InputTag("theIsolation")
 )
 
 tpMapId = cms.EDProducer("TagProbeProducer",
-    MassMaxCut = cms.untracked.double(120.0),
+    MassMaxCut = cms.untracked.double(110.0),
     TagCollection = cms.InputTag("theHLT"),
-    MassMinCut = cms.untracked.double(60.0),
+    MassMinCut = cms.untracked.double(70.0),
     ProbeCollection = cms.InputTag("theId")
 )
 
@@ -214,7 +221,7 @@ tpMapHFSuperClusters = cms.EDProducer("TagProbeProducer",
 )
 
 tpMap_sequence = cms.Sequence(tpMapSuperClusters + tpMapGsfElectrons +
-                              tpMapIsolation + tpMapId + tpMapHFSuperClusters)
+                              tpMapIsolation + tpMapId)
 
 
 
@@ -284,7 +291,6 @@ truthMatch_sequence = cms.Sequence(SuperClustersMatch + GsfElectronsMatch +
                                    HFSCMatch + HFIDMatch)
 
 
-lepton_cands = cms.Sequence(genParticles * hfEMClusteringSequence *
-                            sc_sequence * electron_sequence *
-                            tpMap_sequence * truthMatch_sequence)
+lepton_cands = cms.Sequence(sc_sequence * electron_sequence *
+                            tpMap_sequence)
 

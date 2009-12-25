@@ -26,7 +26,7 @@
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
-#include "DataFormats/JetReco/interface/JetCollection.h"
+#include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "DataFormats/RecoCandidate/interface/RecoCandidate.h"
 
 #include "FWCore/Framework/interface/MakerMacros.h"
@@ -142,44 +142,44 @@ TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
    // ********** Truth matching ********** //
    std::vector< edm::InputTag > defaultTagTruthMatchMapTags;
    tagTruthMatchMapTags_ = iConfig.getUntrackedParameter< std::vector<edm::InputTag> >(
-      "tagTruthMatchMapTags",defaultTagTruthMatchMapTags);
+										       "tagTruthMatchMapTags",defaultTagTruthMatchMapTags);
    for( int i=0; i<(int)tagTruthMatchMapTags_.size(); ++i ) 
-      edm::LogInfo("TagProbeEDMNtuple") << tagTruthMatchMapTags_[i] ;
+     edm::LogInfo("TagProbeEDMNtuple") << tagTruthMatchMapTags_[i] ;
    // Make sure the arrays won't cause a seg fault!
    if( (int)tagTruthMatchMapTags_.size() < map_size )
-   {
-      edm::LogWarning("TagProbeEDMNtuple") << "Warning: Number of TagProbe maps bigger than number of tag arrays!";
-      for( int i=0; i<(map_size-(int)tagTruthMatchMapTags_.size()); ++i ) 
+     {
+       edm::LogWarning("TagProbeEDMNtuple") << "Warning: Number of TagProbe maps bigger than number of tag arrays!";
+       for( int i=0; i<(map_size-(int)tagTruthMatchMapTags_.size()); ++i ) 
 	 tagTruthMatchMapTags_.push_back(dBlankTag);
-   } 
-
+     } 
+     
    std::vector< edm::InputTag > defaultAllProbeTruthMatchMapTags;
    allProbeTruthMatchMapTags_ = iConfig.getUntrackedParameter< std::vector<edm::InputTag> >(
-      "allProbeTruthMatchMapTags",defaultAllProbeTruthMatchMapTags);
+											    "allProbeTruthMatchMapTags",defaultAllProbeTruthMatchMapTags);
    for( int i=0; i<(int)allProbeTruthMatchMapTags_.size(); ++i ) 
-      edm::LogInfo("TagProbeEDMNtuple") << allProbeTruthMatchMapTags_[i] ;
+     edm::LogInfo("TagProbeEDMNtuple") << allProbeTruthMatchMapTags_[i] ;
    // Make sure the arrays won't cause a seg fault!
    if( (int)allProbeTruthMatchMapTags_.size() < map_size )
-   {
-      edm::LogWarning("TagProbeEDMNtuple") << "Number of TagProbe maps bigger than number of tag arrays!" ;
-      for( int i=0; i<(map_size-(int)allProbeTruthMatchMapTags_.size()); ++i ) 
+     {
+       edm::LogWarning("TagProbeEDMNtuple") << "Number of TagProbe maps bigger than number of tag arrays!" ;
+       for( int i=0; i<(map_size-(int)allProbeTruthMatchMapTags_.size()); ++i ) 
 	 allProbeTruthMatchMapTags_.push_back(dBlankTag);
-   } 
+     } 
 
    std::vector< edm::InputTag > defaultPassProbeTruthMatchMapTags;
    passProbeTruthMatchMapTags_ = iConfig.getUntrackedParameter< std::vector<edm::InputTag> >(
-      "passProbeTruthMatchMapTags",defaultPassProbeTruthMatchMapTags);
+											     "passProbeTruthMatchMapTags",defaultPassProbeTruthMatchMapTags);
    for( int i=0; i<(int)passProbeTruthMatchMapTags_.size(); ++i )
-      edm::LogInfo("TagProbeEDMNtuple") << passProbeTruthMatchMapTags_[i] ;
+     edm::LogInfo("TagProbeEDMNtuple") << passProbeTruthMatchMapTags_[i] ;
    // Make sure the arrays won't cause a seg fault!
    if( (int)passProbeTruthMatchMapTags_.size() < map_size )
-   {
-      edm::LogInfo("TagProbeEDMNtuple") << "Warning: Number of TagProbe maps bigger than number of tag arrays!" ;
-      for( int i=0; i<(map_size-(int)passProbeTruthMatchMapTags_.size()); ++i ) 
+     {
+       edm::LogInfo("TagProbeEDMNtuple") << "Warning: Number of TagProbe maps bigger than number of tag arrays!" ;
+       for( int i=0; i<(map_size-(int)passProbeTruthMatchMapTags_.size()); ++i ) 
 	 passProbeTruthMatchMapTags_.push_back(dBlankTag);
-   } 
+     }
    // ************************************ //
-
+     
    // **************** Trigger ******************* //
    const edm::InputTag dTriggerEventTag("triggerSummaryAOD");
    triggerEventTag_ = 
@@ -403,7 +403,7 @@ TagProbeEDMNtuple::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    
    // Fill MC Information
    fillMCInfo();
-   
+
    // Fill Tag-Probe Info
    fillTagProbeInfo();
    
@@ -697,20 +697,21 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 			 << tagProbeMapTags_[itype];
       }
 
-      // Tag MC Truth Match Maps
       edm::Handle< reco::GenParticleMatch> tagmatch;
-      if ( !m_event->getByLabel(tagTruthMatchMapTags_[itype],tagmatch) ) {
-	 edm::LogWarning("Z") << "Could not extract muon tag match map "
-			 << "with input tag " << tagTruthMatchMapTags_[itype];
-      }
-
-      // Truth match for probe
       edm::Handle< reco::GenParticleMatch> allprobematch;
-      if ( !m_event->getByLabel(allProbeTruthMatchMapTags_[itype],allprobematch) ) {
-	 edm::LogWarning("Z") << "Could not extract muon allprobe match map "
-			 << "with input tag " << allProbeTruthMatchMapTags_[itype];
+      if( isMC_ ){
+      // Tag MC Truth Match Maps
+	if ( !m_event->getByLabel(tagTruthMatchMapTags_[itype],tagmatch) ) {
+	  edm::LogWarning("Z") << "Could not extract muon tag match map "
+			       << "with input tag " << tagTruthMatchMapTags_[itype];
+	}
+	
+	// Truth match for probe
+	if ( !m_event->getByLabel(allProbeTruthMatchMapTags_[itype],allprobematch) ) {
+	  edm::LogWarning("Z") << "Could not extract muon allprobe match map "
+			       << "with input tag " << allProbeTruthMatchMapTags_[itype];
+	}
       }
-
       // Tag Candidates
       edm::Handle< reco::CandidateView> tagmuons;
       if ( !m_event->getByLabel(tagCandTags_[itype],tagmuons) ) {
@@ -916,21 +917,20 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 	    tp_probe_etaDet_->push_back(  deta );
 	    tp_probe_phiDet_->push_back(  dphi );
 
-	    // Now look for deltaR between probe & nearest jet
+	    // Now look for deltaR between tag & nearest CaloJet
 	    // but only if jets are enabled
 	    double totaljets = 0.;
             double dRjet_probe_min = 99.;
             if ( !jetTags_.empty() ) {
-	      
-	      edm::Handle<edm::View<reco::Jet> > jetsColl;
+	      edm::Handle<reco::CaloJetCollection> jetsColl;
 	      if ( !m_event->getByLabel(jetTags_, jetsColl) ) {
 		edm::LogWarning("Z") << "Could not extract jet with input tag " << jetTags_;}
 	      if ( !jetsColl->size() == 0){
 		int iCounter = 0;
-
-		for(edm::View<reco::Jet>::const_iterator  
-		      jet = jetsColl->begin(); jet != jetsColl->end();++jet) {
+		for (reco::CaloJetCollection::const_iterator jet = jetsColl->begin(); 
+		     jet != jetsColl->end(); ++jet) {
 		  ++iCounter;
+		  if (jet->et() < 0.5 ) continue ;
 		  double dRjet_probe = deltaR(deta, dphi, jet->eta(), jet->phi());
 		  if(iCounter == 1) dRjet_probe_min = dRjet_probe;
 		  if (dRjet_probe < dRjet_probe_min) {
@@ -938,10 +938,6 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 		  }
 		  ++totaljets;
 		}
-	      }
-	      else {
-		totaljets = 0.;
-		dRjet_probe_min = 99.;
 	      }
             }
             tp_probe_jetDeltaR_->push_back(  dRjet_probe_min );
@@ -1023,6 +1019,7 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 void
 TagProbeEDMNtuple::fillTrueEffInfo()
 {
+  if( isMC_ ){
    std::auto_ptr<int> ncnd_( new int );
    std::auto_ptr< std::vector<int> > cnd_type_( new std::vector<int> );   
    std::auto_ptr< std::vector<int> > cnd_tag_( new std::vector<int> );    
@@ -1453,6 +1450,7 @@ TagProbeEDMNtuple::fillTrueEffInfo()
    m_event->put( cnd_Detet_, "CndetDet" ); 
    m_event->put( cnd_Deteta_, "CndetaDet" ); 
    m_event->put( cnd_Detphi_, "CndphiDet" );  
+  }
 }
 // *********************************************************************** //
 
