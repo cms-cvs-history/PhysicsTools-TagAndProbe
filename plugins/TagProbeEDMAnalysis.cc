@@ -1718,7 +1718,7 @@ void TagProbeEDMAnalysis::doFit( std::string &bvar1, std::vector< double > bins1
       RooAbsPdf* pdf =  totalPdf.getPdf(type->GetName());
       RooAbsData* dset = (RooAbsData*) dsetList->FindObject(type->GetName());
      
-      if (pdf && dset && dset->numEntries(kTRUE)!=0.) 
+      if (pdf && dset && dset->numEntries()!=0.) 
       {               
 	 edm::LogInfo("TagProbeEDMAnalysis") << "GOF Entries " << dset->numEntries() << " " 
 	      << type->GetName() ;

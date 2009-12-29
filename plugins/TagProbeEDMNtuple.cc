@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Mon May  5 08:47:29 CDT 2008
-// $Id: TagProbeEDMNtuple.cc,v 1.15.8.1 2009/11/09 02:11:47 kalanand Exp $
+// $Id: TagProbeEDMNtuple.cc,v 1.15.8.2.2.1 2009/12/25 02:42:27 kalanand Exp $
 //
 //
 // Kalanand Mishra: October 7, 2008 
@@ -1496,6 +1496,7 @@ int TagProbeEDMNtuple::ProbePassProbeOverlap( const reco::CandidateBaseRef& prob
 				       probe,checkExactOverlap_);
 
 	 if(candType_ != "Muon" ) {
+
 	   reco::SuperClusterRef probeSC;
 	   reco::SuperClusterRef passprobeSC; 
 
@@ -1503,11 +1504,13 @@ int TagProbeEDMNtuple::ProbePassProbeOverlap( const reco::CandidateBaseRef& prob
 				    probe->get< reco::SuperClusterRef >();
 
 	   reco::CandidateBaseRef ref = passprobes->refAt(ipp);
-
 	   if( not ref.isNull() ) passprobeSC = 
 				    ref->get< reco::SuperClusterRef >();
 
-	   isOverlap = isOverlap && ( probeSC == passprobeSC );
+	   // 	   isOverlap = isOverlap && ( probeSC == passprobeSC );
+
+	   isOverlap = isOverlap && ((probeSC->eta()==passprobeSC->eta())&&
+				     (probeSC->phi()==passprobeSC->phi()));
 	 }
 
 

@@ -4,7 +4,8 @@
    <use name=root>
    <use name=rootmath>
    <use name=rootcore>
-   <use name=rootroofit>
+   <use name=roofit>
+   <use name=roofitcore>
    <use name=FWCore/Framework>
    <use name=FWCore/MessageLogger>
    <use name=FWCore/PluginManager>
@@ -20,6 +21,9 @@
    <use name=DataFormats/Candidate>
    <use name=DataFormats/Common>
    <use name=DataFormats/HLTReco>
+   <use name=HLTrigger/HLTcore>
+   <use name=L1Trigger/GlobalTriggerAnalyzer>
+   <use name=DataFormats/HcalIsolatedTrack>
    <use name=PhysicsTools/TagAndProbe>
    <use name=PhysicsTools/HepMCCandAlgos>
    <use name=DataFormats/BTauReco>

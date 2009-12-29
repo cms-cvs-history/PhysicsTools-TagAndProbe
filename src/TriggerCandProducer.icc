@@ -89,7 +89,8 @@ void TriggerCandProducer<C>::produce(edm::Event &event,
      return;
    }
 
-
+   //---------------------------------------------------------------------------
+   /*
    std::string l1pathname;
    HLTConfigProvider hltConfig;
    hltConfig.init(hltTag_.process() );
@@ -106,28 +107,47 @@ void TriggerCandProducer<C>::produce(edm::Event &event,
        edm::ParameterSet l1GTPSet = hltConfig.modulePSet(*filter);
        l1GTPSet.getParameter<std::string>("L1SeedsLogicalExpression");
        l1pathname = *filter;
-       break;       
+       break;
      }
    }
-
+   */
+   //--------------------------------------------------------------------------
+   //std::cout << "path name " << l1pathname << std::endl;
 
 
    // loop over these objects to see whether they match
    const trigger::TriggerObjectCollection& TOC( trgEvent->getObjects() );
      
 
-
+   //-----------------------------------------------------------------
    // find how many relevant
+   /*
    edm::InputTag l1testTag(l1pathname,"", hltTag_.process() );
    const int index = trgEvent->filterIndex( l1testTag );
+   */
+   //-----------------------------------------------------------------
+
+
+
+
+
+   //-----------------------------------------------------------------------
+   int index  = trgEvent->sizeFilters();   
+   for(int i=0; i != trgEvent->sizeFilters(); ++i) {
+     std::string label(trgEvent->filterTag(i).label());
+     if( label == hltTag_.label() ) index = i;
+   }
+   //-----------------------------------------------------------------------
+
+
+
 
    if( index >= trgEvent->sizeFilters() ) {
-     // edm::LogInfo("info")<< "******** Following TRIGGER Name Not in Dataset: " << 
+     // edm::LogInfo("info")<< "******** Following TRIGGER Name Not in Dataset: " <<
      //  hltTag_.label();
      event.put(outCol);
      return;
    }
-
 
    // find how many objects there are
    const trigger::Keys& KEYS(trgEvent->filterKeys(index));

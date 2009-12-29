@@ -1,7 +1,8 @@
 <use name=root>
 <use name=rootmath>
 <use name=rootcore>
-<use name=rootroofit>
+<use name=roofit>
+<use name=roofitcore>
 <use name=FWCore/Framework>
 <use name=FWCore/MessageLogger>
 <use name=FWCore/PluginManager>
@@ -32,7 +33,8 @@
    <use name=root>
    <use name=rootmath>
    <use name=rootcore>
-   <use name=rootroofit>
+   <use name=roofit>
+   <use name=roofitcore>
    <use name=FWCore/Framework>
    <use name=FWCore/PluginManager>
    <use name=FWCore/ParameterSet>
