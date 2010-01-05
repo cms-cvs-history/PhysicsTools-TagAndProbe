@@ -347,20 +347,20 @@ void ElectronMCEfficiency::analyze(const edm::Event& iEvent,
     ///////////// make empty entry in-between every event ///
      ////////////////////////////////////////////////////////
 
-    bool allInAcc = true;
-    for(size_t j = 0; j < ndau; ++ j) {
-      const reco::Candidate *d = Res->daughter( j );
-      if( d==0 ) continue;
-      if( !(abs(d->pdgId()) == 11) ) continue;
-      //std::cout << "pdgId " << d->pdgId() << std::endl;
-      isInAcceptance = CheckAcceptance(iEvent, *d);
-      if(!isInAcceptance) allInAcc=false;
-    } 
-    if(!allInAcc) continue;
-    else {
-      isSuperCluster=false;
-      myTree->Fill();
-    }
+//     bool allInAcc = true;
+//     for(size_t j = 0; j < ndau; ++ j) {
+//       const reco::Candidate *d = Res->daughter( j );
+//       if( d==0 ) continue;
+//       if( !(abs(d->pdgId()) == 11) ) continue;
+//       //      std::cout << "pdgId " << d->pdgId() << std::endl;
+//       isInAcceptance = CheckAcceptance(iEvent, *d);
+//       if(!isInAcceptance) allInAcc=false;
+//     }
+//     if(Res->mass()<70 || Res->mass()>110) continue;
+//     myTree->Fill();
+   
+//     if(!allInAcc) continue;
+
    ////////////////////////////////////////////////////////////
     */
  

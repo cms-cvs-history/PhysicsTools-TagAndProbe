@@ -685,10 +685,10 @@ void ElectronEfficiency::buildTree(){
   mTree->Branch("event_PVz"        ,"vector<double>"      ,&mPVz);
   mTree->Branch("event_nPV"                ,&mNPV                 ,"mNPV/I");
 
-  mTree->Branch("event_met"        ,&mMET                ,"mMET/F");
-  mTree->Branch("event_sumet"      ,&mSumET              ,"mSumET/F");
-  mTree->Branch("event_metNoHF"    ,&mMETnoHF            ,"mMETnoHF/F");
-  mTree->Branch("event_sumetNoHF"  ,&mSumETnoHF          ,"mSumETnoHF/F");
+  mTree->Branch("event_met"        ,&mMET                ,"mMET/D");
+  mTree->Branch("event_sumet"      ,&mSumET              ,"mSumET/D");
+  mTree->Branch("event_metNoHF"    ,&mMETnoHF            ,"mMETnoHF/D");
+  mTree->Branch("event_sumetNoHF"  ,&mSumETnoHF          ,"mSumETnoHF/D");
 
 
 }
