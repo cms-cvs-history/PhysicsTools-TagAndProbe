@@ -20,7 +20,6 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 process.tagMuons = cms.EDFilter("MuonRefSelector",
     src = cms.InputTag("muons"),
     cut = cms.string("isGlobalMuon && pt > 3 && abs(eta) < 2.4"), 
-    filter = cms.bool(True),
 )
 
 process.trkProbes = cms.EDFilter("MuonRefSelector",
