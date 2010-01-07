@@ -14,7 +14,7 @@ process.RunFit = cms.EDAnalyzer("TagProbeEDMAnalysis",
       ## Set mode to read from files ...
       Mode = cms.untracked.string("Read"),
 
-      ReadFromFiles     = cms.untracked.vstring("testWrite.root", "testWrite.2.root"),
+      ReadFromFiles     = cms.untracked.vstring("testWrite.root"),
       ReadFromDirectory = cms.untracked.string("MakeHisto"),
       FitFileName       = cms.untracked.string("fit_output.root"), ##<< actually not used
 
