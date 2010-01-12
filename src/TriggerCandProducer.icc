@@ -13,6 +13,7 @@
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
 
+
 template<typename C>
 TriggerCandProducer<C>::TriggerCandProducer(const edm::ParameterSet& iConfig )
 {
@@ -90,64 +91,58 @@ void TriggerCandProducer<C>::produce(edm::Event &event,
    }
 
    //---------------------------------------------------------------------------
-   /*
-   std::string l1pathname;
-   HLTConfigProvider hltConfig;
-   hltConfig.init(hltTag_.process() );
-   std::vector<std::string> filters = hltConfig.moduleLabels( hltTag_.label() );
-
-   for(std::vector<std::string>::iterator filter =
-	 filters.begin(); filter!= filters.end(); ++filter ) {
-
-     // cout << hltTag_ << "\t" << *filter << "\t" <<
-     //  hltConfig.moduleType(*filter) << endl;
-   
-     if (hltConfig.moduleType(*filter) == "HLTLevel1GTSeed") {
-       
-       edm::ParameterSet l1GTPSet = hltConfig.modulePSet(*filter);
-       l1GTPSet.getParameter<std::string>("L1SeedsLogicalExpression");
-       l1pathname = *filter;
-       break;
-     }
-   }
-   */
-   //--------------------------------------------------------------------------
-   //std::cout << "path name " << l1pathname << std::endl;
 
 
    // loop over these objects to see whether they match
    const trigger::TriggerObjectCollection& TOC( trgEvent->getObjects() );
      
 
+   if( filterName_.empty() ) {
+     HLTConfigProvider hltConfig;
+     hltConfig.init(hltTag_.process() );
+     std::vector<std::string> filters = hltConfig.moduleLabels( hltTag_.label() );
+
+     for(std::vector<std::string>::iterator filter =
+	   filters.begin(); filter!= filters.end(); ++filter ) {
+
+       edm::InputTag testTag(*filter,"", hltTag_.process() );
+
+       int testindex = trgEvent->filterIndex(testTag);
+       if ( !(testindex >= trgEvent->sizeFilters()) ) {
+
+	 filterName_ = *filter;
+       }
+     }
+   }
+
+
+   int index  = trgEvent->sizeFilters();   
+
+
    //-----------------------------------------------------------------
    // find how many relevant
    /*
-   edm::InputTag l1testTag(l1pathname,"", hltTag_.process() );
+   edm::InputTag l1testTag(filterName_,"", hltTag_.process() );
    const int index = trgEvent->filterIndex( l1testTag );
    */
    //-----------------------------------------------------------------
-
-
-
-
-
    //-----------------------------------------------------------------------
-   int index  = trgEvent->sizeFilters();   
-   for(int i=0; i != trgEvent->sizeFilters(); ++i) {
-     std::string label(trgEvent->filterTag(i).label());
-     if( label == hltTag_.label() ) index = i;
-   }
+//    for(int i=0; i != trgEvent->sizeFilters(); ++i) {
+//      std::string label(trgEvent->filterTag(i).label());
+//      if( label == hltTag_.label() ) index = i;
+//    }
    //-----------------------------------------------------------------------
 
 
 
 
    if( index >= trgEvent->sizeFilters() ) {
-     // edm::LogInfo("info")<< "******** Following TRIGGER Name Not in Dataset: " <<
-     //  hltTag_.label();
+     edm::LogInfo("info")<< "******** Following TRIGGER Name Not in Dataset: " <<
+       hltTag_.label();
      event.put(outCol);
      return;
    }
+
 
    // find how many objects there are
    const trigger::Keys& KEYS(trgEvent->filterKeys(index));
@@ -163,7 +158,6 @@ void TriggerCandProducer<C>::produce(edm::Event &event,
 
      // Did this tag cause a HLT trigger?
      bool hltTrigger = false;
-
 
      for(int ipart = 0; ipart != nK; ++ipart) { 
 
@@ -192,6 +186,8 @@ void TriggerCandProducer<C>::produce(edm::Event &event,
 
 template<typename C>
 void TriggerCandProducer<C>::beginJob() {
+
+   filterName_ = "";
 }
 
 

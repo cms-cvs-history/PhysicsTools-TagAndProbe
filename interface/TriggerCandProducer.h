@@ -30,7 +30,7 @@ class TriggerCandProducer : public edm::EDProducer
   edm::InputTag triggerEventTag_;
   edm::InputTag hltTag_;
   double delRMatchingCut_;
-
+  std::string filterName_;
 };
 #include "PhysicsTools/TagAndProbe//src/TriggerCandProducer.icc"
 #endif

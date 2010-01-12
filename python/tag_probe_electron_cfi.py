@@ -155,9 +155,9 @@ theId = cms.EDProducer("eidCandProducer",
 
 
 # Trigger  ##################
-theHLT = cms.EDProducer("eTriggerCandProducer",
+theHLT = cms.EDProducer("eTriggerGsfElectronCollection",
     InputProducer = cms.InputTag('theId'),
-    hltTag = cms.untracked.InputTag("hltL1NonIsoHLTNonIsoSingleElectronEt15LTITrackIsolFilter","","HLT"),
+    hltTag = cms.untracked.InputTag("HLT_Ele15_SW_LooseTrackIso_L1R","","HLT"),
     triggerEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD","","HLT")
 )
 
