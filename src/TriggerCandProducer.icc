@@ -97,27 +97,28 @@ void TriggerCandProducer<C>::produce(edm::Event &event,
    const trigger::TriggerObjectCollection& TOC( trgEvent->getObjects() );
      
 
-   if( filterName_.empty() ) {
-     HLTConfigProvider hltConfig;
-     hltConfig.init(hltTag_.process() );
-     std::vector<std::string> filters = hltConfig.moduleLabels( hltTag_.label() );
+   edm::InputTag filterTag;
+   HLTConfigProvider hltConfig;
+   hltConfig.init(hltTag_.process() );
+   std::vector<std::string> filters = hltConfig.moduleLabels( hltTag_.label() );
 
-     for(std::vector<std::string>::iterator filter =
-	   filters.begin(); filter!= filters.end(); ++filter ) {
+   for(std::vector<std::string>::iterator filter =
+	 filters.begin(); filter!= filters.end(); ++filter ) {
 
-       edm::InputTag testTag(*filter,"", hltTag_.process() );
+     edm::InputTag testTag(*filter,"", hltTag_.process() );
 
-       int testindex = trgEvent->filterIndex(testTag);
-       if ( !(testindex >= trgEvent->sizeFilters()) ) {
+     int testindex = trgEvent->filterIndex(testTag);
+     if ( !(testindex >= trgEvent->sizeFilters()) ) {
 
-	 filterName_ = *filter;
-       }
+       filterName_ = *filter;
+       filterTag=testTag;
      }
    }
 
+   int index  = trgEvent->filterIndex( filterTag );   
 
-   int index  = trgEvent->sizeFilters();   
 
+   //   std::cout << "hltTag_.label() " <<  hltTag_.label() << "   filter name " <<  filterName_ << "  index " << index << "  sizeFilters " <<  trgEvent->sizeFilters() << std::endl;
 
    //-----------------------------------------------------------------
    // find how many relevant

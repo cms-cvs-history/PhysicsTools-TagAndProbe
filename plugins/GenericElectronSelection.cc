@@ -146,7 +146,7 @@ void GenericElectronSelection::produce(edm::Event &event, const edm::EventSetup 
   // --------------------------------------------
 
 
-   int index =0, eClass = 2;
+   int index =-1, eClass = 2;
    double elecEta=10.0, elecPhi=10.0, elecE=-1.0, elecEt=-1.0, 
      deltaEta=10.0, deltaPhi=10.0, sigmaEtaEta=10.0;
    double tkIsolation = 100.0, ecalIsolation = 100.0, hcalIsolation = 100.0;
@@ -156,6 +156,8 @@ void GenericElectronSelection::produce(edm::Event &event, const edm::EventSetup 
 
    for(edm::View<reco::GsfElectron>::const_iterator  
 	 elec = electrons->begin(); elec != electrons->end();++elec) {
+
+     ++index;
 
      ////// -------- ensure that the electron has correct charge ------ 
      int q = (elec->charge() > 0 ? 1 : -1);
@@ -255,8 +257,6 @@ void GenericElectronSelection::produce(edm::Event &event, const edm::EventSetup 
        hname = "elecEt";
        FillHist(hname,m_HistNames1D,elecEt);
      }
-
-     ++index;
    }
    //
    event.put(outCol);
