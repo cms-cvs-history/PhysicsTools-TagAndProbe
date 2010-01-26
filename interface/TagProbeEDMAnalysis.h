@@ -4,7 +4,7 @@
 //
 // Original Author: Nadia Adam (Princeton University) 
 //         Created:  Fri May 16 16:48:24 CEST 2008
-// $Id: TagProbeEDMAnalysis.h,v 1.21 2009/09/13 06:15:40 valerieh Exp $
+// $Id: TagProbeEDMAnalysis.h,v 1.22 2009/10/01 09:43:27 ahunt Exp $
 //
 //
 // Kalanand Mishra: July 1, 2008 
@@ -18,7 +18,7 @@
 
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 class EffTableLoader;
 class SideBandSubtraction;
