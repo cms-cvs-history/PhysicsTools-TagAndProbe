@@ -10,7 +10,8 @@
 #include "DataFormats/HcalIsolatedTrack/interface/IsolatedPixelTrackCandidateFwd.h"
 #include "DataFormats/EgammaCandidates/interface/Electron.h"
 #include "DataFormats/EgammaCandidates/interface/ElectronFwd.h"
-
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
 #include "PhysicsTools/TagAndProbe/interface/TriggerCandProducer.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 
@@ -26,4 +27,3 @@ typedef TriggerCandProducer<reco::IsolatedPixelTrackCandidateCollection> eTrigge
 DEFINE_ANOTHER_FWK_MODULE( eTriggerIsolatedPixelTrackCandidateCollection );
 typedef TriggerCandProducer<reco::ElectronCollection> eTriggerElectronCollection;
 DEFINE_ANOTHER_FWK_MODULE( eTriggerElectronCollection );
-

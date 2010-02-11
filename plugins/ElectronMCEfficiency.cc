@@ -76,6 +76,7 @@ class ElectronMCEfficiency : public edm::EDAnalyzer
   edm::InputTag  hltFilter_;
   edm::InputTag  SuperClusters_;
 
+  bool  useHlt_;
   std::vector<int> truthParentId_;
   double ElectronPtCut_;
   double dRWindow_;
@@ -155,7 +156,7 @@ ElectronMCEfficiency::ElectronMCEfficiency(const edm::ParameterSet& iConfig)
   const edm::InputTag 
     dHLT("hltL1NonIsoHLTNonIsoSingleElectronEt15LTITrackIsolFilter","","HLT");
   hltFilter_ = iConfig.getUntrackedParameter<edm::InputTag>("hltFilter",dHLT);
-
+  useHlt_ = iConfig.getUntrackedParameter<bool>("useHlt",true);
 
   // MC truth parent Id
   std::vector<int>       dEmptyIntVec;
@@ -326,11 +327,12 @@ void ElectronMCEfficiency::analyze(const edm::Event& iEvent,
 
   // ------------ trigger objects 
   edm::Handle<trigger::TriggerEvent> triggerObj;
-  iEvent.getByLabel(triggerSummaryLabel_,triggerObj); 
-  if(!triggerObj.isValid()) { 
-    edm::LogInfo("TriggerEvent") << " objects not found"; 
+  if(useHlt_){
+    iEvent.getByLabel(triggerSummaryLabel_,triggerObj); 
+    if(!triggerObj.isValid()) { 
+      edm::LogInfo("TriggerEvent") << " objects not found"; 
+    }
   }
-  
   size_t nZ = genParticles->size();
   if( nZ < 1 ) return;
   const reco::Candidate *Res(0);
@@ -404,7 +406,9 @@ void ElectronMCEfficiency::analyze(const edm::Event& iEvent,
       boolResults( iEvent, iSetup, *d);
 
       // check trigger matching
-      isTriggered = CheckTriggerMatch( triggerObj, probeEta, probePhi );
+
+      if(useHlt_) 
+	isTriggered = CheckTriggerMatch( triggerObj, probeEta, probePhi );
 
       isPassWoff    = isPassWoff && isInAcceptance;
       isPassZoff    = isPassZoff && isInAcceptance;

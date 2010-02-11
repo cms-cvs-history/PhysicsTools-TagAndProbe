@@ -1,4 +1,3 @@
-#include "PhysicsTools/TagAndProbe/interface/TriggerCandProducer.h"
 #include <cmath>
 #include "DataFormats/Math/interface/deltaR.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
@@ -6,34 +5,28 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include <string>
 
-#include "DataFormats/HLTReco/interface/TriggerObject.h"
-#include "FWCore/Framework/interface/TriggerNames.h"
-#include "DataFormats/Common/interface/TriggerResults.h"
-#include "DataFormats/HLTReco/interface/TriggerEvent.h"
-#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
-
-
-
 template<typename C>
 TriggerCandProducer<C>::TriggerCandProducer(const edm::ParameterSet& iConfig )
 {
 
   _inputProducer = iConfig.template getParameter<edm::InputTag>("InputProducer");
-
-   // **************** Trigger ******************* //
-   const edm::InputTag dTriggerEventTag("hltTriggerSummaryAOD","","HLT8E29");
-   triggerEventTag_ = 
-      iConfig.getUntrackedParameter<edm::InputTag>("triggerEventTag",
-						   dTriggerEventTag);
-
-   const edm::InputTag dHLTTag("HLT_Ele15_LW_L1R", "","HLT8E29");
-   hltTag_ = iConfig.getUntrackedParameter<edm::InputTag>("hltTag",dHLTTag);
-
-   delRMatchingCut_ = iConfig.getUntrackedParameter<double>("triggerDelRMatch",
-							    0.30);
-   // ******************************************** //
-
-   produces<reco::CandidateCollection>();
+  
+  // **************** Trigger ******************* //
+  const edm::InputTag dTriggerEventTag("hltTriggerSummaryAOD","","HLT8E29");
+  triggerEventTag_ = 
+    iConfig.getUntrackedParameter<edm::InputTag>("triggerEventTag",
+						 dTriggerEventTag);
+  
+  const edm::InputTag dHLTTag("HLT_Ele15_LW_L1R", "","HLT8E29");
+  hltTag_ = iConfig.getUntrackedParameter<edm::InputTag>("hltTag",dHLTTag);
+  
+  delRMatchingCut_ = iConfig.getUntrackedParameter<double>("triggerDelRMatch",
+							   0.30);
+  // ******************************************** //
+  //Trigger path VS l1 trigger filter. Trigger Path is default.
+  isFilter_ = iConfig.getUntrackedParameter<bool>("isTriggerFilter",false);
+  printIndex_ = iConfig.getUntrackedParameter<bool>("verbose",false);
+  produces<reco::CandidateCollection>();
 }
 
 
@@ -92,33 +85,49 @@ void TriggerCandProducer<C>::produce(edm::Event &event,
 
    //---------------------------------------------------------------------------
 
-
+   edm::InputTag filterTag;
    // loop over these objects to see whether they match
    const trigger::TriggerObjectCollection& TOC( trgEvent->getObjects() );
      
+   
+   int index=9999;
 
-   edm::InputTag filterTag;
-   HLTConfigProvider hltConfig;
-   hltConfig.init(hltTag_.process() );
-   std::vector<std::string> filters = hltConfig.moduleLabels( hltTag_.label() );
-
-   for(std::vector<std::string>::iterator filter =
-	 filters.begin(); filter!= filters.end(); ++filter ) {
-
-     edm::InputTag testTag(*filter,"", hltTag_.process() );
-
-     int testindex = trgEvent->filterIndex(testTag);
-     if ( !(testindex >= trgEvent->sizeFilters()) ) {
-
-       filterName_ = *filter;
-       filterTag=testTag;
+   if(isFilter_){
+   //-----------------------------------------------------------------------
+   filterName_ = hltTag_.label();
+   for(int i=0; i != trgEvent->sizeFilters(); ++i) {
+     std::string label(trgEvent->filterTag(i).label());
+     if( label == hltTag_.label() ) index = i;
+   }
+   //-----------------------------------------------------------------------
+   if(printIndex_) std::cout << "filter search: " <<  hltTag_.label() << "   index: " << index << std::endl;
+   }
+   else{
+     bool changed = false;
+     if(! hltConfig_.init(event, hltTag_.process(), changed) ){
+       edm::LogError("TriggerCandProducer") << "Error! Can't initialize HLTConfigProvider ";
+       return;
      }
+     if(printIndex_ && changed) std::cout << "HLT configuration changed!!!!" << std::endl;
+     
+     std::vector<std::string> filters = hltConfig_.moduleLabels( hltTag_.label() );
+     for(std::vector<std::string>::iterator filter =
+	   filters.begin(); filter!= filters.end(); ++filter ) {
+       
+       edm::InputTag testTag(*filter,"", hltTag_.process() );
+       
+       int testindex = trgEvent->filterIndex(testTag);
+       if ( !(testindex >= trgEvent->sizeFilters()) ) {
+	 
+	 filterName_ = *filter;
+	 filterTag=testTag;
+       }
+     }
+     
+     index = trgEvent->filterIndex( filterTag );
    }
 
-   int index  = trgEvent->filterIndex( filterTag );   
-
-
-   //   std::cout << "hltTag_.label() " <<  hltTag_.label() << "   filter name " <<  filterName_ << "  index " << index << "  sizeFilters " <<  trgEvent->sizeFilters() << std::endl;
+   if(printIndex_) std::cout << "hltTag_.label() " <<  hltTag_.label() << "   filter name " <<  filterName_ << "  index " << index << "  sizeFilters " <<  trgEvent->sizeFilters() << std::endl;
 
    //-----------------------------------------------------------------
    // find how many relevant
@@ -127,12 +136,6 @@ void TriggerCandProducer<C>::produce(edm::Event &event,
    const int index = trgEvent->filterIndex( l1testTag );
    */
    //-----------------------------------------------------------------
-   //-----------------------------------------------------------------------
-//    for(int i=0; i != trgEvent->sizeFilters(); ++i) {
-//      std::string label(trgEvent->filterTag(i).label());
-//      if( label == hltTag_.label() ) index = i;
-//    }
-   //-----------------------------------------------------------------------
 
 
 
@@ -187,8 +190,7 @@ void TriggerCandProducer<C>::produce(edm::Event &event,
 
 template<typename C>
 void TriggerCandProducer<C>::beginJob() {
-
-   filterName_ = "";
+  filterName_ = "";
 }
 
 

@@ -10,6 +10,13 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/Candidate/interface/ShallowCloneCandidate.h"
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "PhysicsTools/TagAndProbe/interface/TriggerCandProducer.h"
+
+#include "DataFormats/HLTReco/interface/TriggerObject.h"
+#include "FWCore/Framework/interface/TriggerNames.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/HLTReco/interface/TriggerEvent.h"
 
 // forward declarations
 template<typename C>
@@ -24,13 +31,16 @@ class TriggerCandProducer : public edm::EDProducer
   virtual void produce(edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
 
-  // ----------member data ---------------------------
-      
+  // ----------member data --------------------------
+    
   edm::InputTag _inputProducer;
   edm::InputTag triggerEventTag_;
   edm::InputTag hltTag_;
   double delRMatchingCut_;
   std::string filterName_;
+  bool isFilter_;
+  bool printIndex_;
+  HLTConfigProvider hltConfig_;
 };
 #include "PhysicsTools/TagAndProbe//src/TriggerCandProducer.icc"
 #endif
