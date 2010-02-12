@@ -12,9 +12,11 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 #process.GlobalTag.globaltag = cms.string('IDEAL_V11::All')
 #process.GlobalTag.globaltag = cms.string('CRAFT_30X::All')
 #process.GlobalTag.globaltag = "STARTUP_V7::All"
-process.GlobalTag.globaltag = cms.string('MC_31X_V3::All')
+#process.GlobalTag.globaltag = cms.string('MC_31X_V3::All')
+process.GlobalTag.globaltag = cms.string('STARTUP3X_V14::All')
 process.load("PhysicsTools.TagAndProbe.tag_probe_electron_cfi")
-process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer09_cff")
+#process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer09_cff")
+process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer09_7TeV_ReReco332_cff")
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring('/store/mc/Summer09/Zee/GEN-SIM-RECO/MC_31X_V3_SD_Ele15-v1/0003/C62D4337-F1AB-DE11-A96B-0018F3D0970E.root')
@@ -30,7 +32,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.antikt5CaloJetsCor  = cms.EDFilter("CaloJetRefSelector",                                           
     src = cms.InputTag("L2L3CorJetAK5Calo"),
-    cut = cms.string('pt > 20.0')
+    cut = cms.string('pt > 20.0 && abs(eta)<2.6')
 )
 
 
@@ -65,7 +67,8 @@ process.TPEdm = cms.EDProducer("TagProbeEDMNtuple",
     # in case we want it
     mcParticles = cms.untracked.vint32(23, 11, 22),
     trackTags = cms.untracked.VInputTag(cms.InputTag("generalTracks")),
-    jets = cms.untracked.string("antikt5CaloJetsClean"),                          
+    jets = cms.untracked.string("antikt5CaloJetsClean"),
+    MET  =  cms.untracked.string("metNoHF"),                           
     # Pass Probe Electron Candidate Collections
     passProbeCandTags = cms.untracked.VInputTag(cms.InputTag("theGsfElectrons"), cms.InputTag("theIsolation"), cms.InputTag("theId"), cms.InputTag("theHLT"), cms.InputTag("HFElectronID")),
     verticesTag = cms.untracked.InputTag("offlinePrimaryVertices"),

@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Mon May  5 08:47:29 CDT 2008
-// $Id: TagProbeEDMNtuple.cc,v 1.15.8.2.2.1 2009/12/25 02:42:27 kalanand Exp $
+// $Id: TagProbeEDMNtuple.cc,v 1.15.8.2.2.2 2009/12/29 23:25:36 kalanand Exp $
 //
 //
 // Kalanand Mishra: October 7, 2008 
@@ -26,8 +26,10 @@
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
-#include "DataFormats/JetReco/interface/CaloJetCollection.h"
+#include "DataFormats/JetReco/interface/JetCollection.h"
 #include "DataFormats/RecoCandidate/interface/RecoCandidate.h"
+#include "DataFormats/METReco/interface/CaloMET.h"
+#include "DataFormats/METReco/interface/CaloMETFwd.h"
 
 #include "FWCore/Framework/interface/MakerMacros.h"
 
@@ -74,13 +76,12 @@ TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
       "trackTags",dTrackTags);
    // ********************************* //
 
-
-
    // ********** Calo Jets ********** //
    jetTags_ = iConfig.getUntrackedParameter<std::string>("jets","");
-
+   
+   // ********** Calo MET *************** //
+   metTags_ = iConfig.getUntrackedParameter<std::string>("MET","");
    // ********************************* //
-
 
    // ********** Tag-Probes ********** //
    std::vector< edm::InputTag > defaultTagProbeMapTags;
@@ -102,7 +103,7 @@ TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
    std::vector< edm::InputTag > defaultTagCandTags;
    tagCandTags_ = iConfig.getUntrackedParameter< std::vector<edm::InputTag> >(
       "tagCandTags",defaultTagCandTags);
-   for( int i=0; i<(int)tagCandTags_.size(); ++i ) 
+   for( int i=0; i<(int)tagCandTags_.size(); ++i )
       edm::LogInfo("TagProbeEDMtuple") << tagCandTags_[i] ;
    // Make sure the arrays won't cause a seg fault!
    if( (int)tagCandTags_.size() < map_size )
@@ -328,6 +329,9 @@ TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
  
    produces<std::vector<float> >( "TPProbejetDeltaR" ).setBranchAlias( "TPProbejetDeltaR" ); /* Probe jet delta_R */
    produces<std::vector<float> >( "TPProbetotJets" ).setBranchAlias( "TPProbetotJets" );    /* Number of total jets */   
+   produces<std::vector<float> >( "TPProbeMET" ).setBranchAlias( "TPProbeMET" );    /* MET */   
+   produces<std::vector<float> >( "TPProbesumET" ).setBranchAlias( "TPProbesumET" );    /* sumET */   
+   produces<std::vector<float> >( "TPProbeHT" ).setBranchAlias( "TPProbeHT" );    /* HT */   
 
    produces< int >( "nCnd" ).setBranchAlias( "nCnd" );                        /* Number of true daughter cands. */
    produces< std::vector<int> >( "Cndtype" ).setBranchAlias( "Cndtype" );     /* Type of eff measurement. */
@@ -679,12 +683,36 @@ TagProbeEDMNtuple::fillTagProbeInfo()
    std::auto_ptr< std::vector<float> > tp_probe_phiDet_( new std::vector<float> ); 
    std::auto_ptr< std::vector<float> > tp_probe_jetDeltaR_( new std::vector<float> ); 
    std::auto_ptr< std::vector<float> > tp_probe_totJets_( new std::vector<float> );
+   std::auto_ptr< std::vector<float> > tp_probe_MET_( new std::vector<float> );
+   std::auto_ptr< std::vector<float> > tp_probe_sumET_( new std::vector<float> );
+   std::auto_ptr< std::vector<float> > tp_probe_HT_( new std::vector<float> );
 
 
 
    // Trigger Info
    edm::Handle< trigger::TriggerEvent> trgEvent;
    m_event->getByLabel(triggerEventTag_,trgEvent);
+
+   // Add MET and sumET
+   
+   double mMETnoHF;
+   double mSumETnoHF;
+
+   edm::Handle< reco::CaloMETCollection> metNoHF;
+   m_event->getByLabel(metTags_,metNoHF);
+   if (metNoHF->size() == 0)
+     {
+       mMETnoHF   = -1;
+       mSumETnoHF = -1;
+     }
+   else
+     {
+       mMETnoHF   = (*metNoHF)[0].et();
+       mSumETnoHF = (*metNoHF)[0].sumEt();
+     }
+
+   tp_probe_MET_->push_back(  mMETnoHF );
+   tp_probe_sumET_->push_back( mSumETnoHF );
 
    // Fill some information about the tag & probe collections
    int nrtp = 0;
@@ -705,7 +733,7 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 	  edm::LogWarning("Z") << "Could not extract muon tag match map "
 			       << "with input tag " << tagTruthMatchMapTags_[itype];
 	}
-	
+
 	// Truth match for probe
 	if ( !m_event->getByLabel(allProbeTruthMatchMapTags_[itype],allprobematch) ) {
 	  edm::LogWarning("Z") << "Could not extract muon allprobe match map "
@@ -921,27 +949,29 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 	    // but only if jets are enabled
 	    double totaljets = 0.;
             double dRjet_probe_min = 99.;
+            double HT=0.;
             if ( !jetTags_.empty() ) {
-	      edm::Handle<reco::CaloJetCollection> jetsColl;
+	      edm::Handle< edm::View<reco::Jet>  > jetsColl;
 	      if ( !m_event->getByLabel(jetTags_, jetsColl) ) {
 		edm::LogWarning("Z") << "Could not extract jet with input tag " << jetTags_;}
 	      if ( !jetsColl->size() == 0){
 		int iCounter = 0;
-		for (reco::CaloJetCollection::const_iterator jet = jetsColl->begin(); 
+		for (edm::View<reco::Jet>::const_iterator jet = jetsColl->begin(); 
 		     jet != jetsColl->end(); ++jet) {
 		  ++iCounter;
-		  if (jet->et() < 0.5 ) continue ;
 		  double dRjet_probe = deltaR(deta, dphi, jet->eta(), jet->phi());
 		  if(iCounter == 1) dRjet_probe_min = dRjet_probe;
 		  if (dRjet_probe < dRjet_probe_min) {
 		    dRjet_probe_min = dRjet_probe;
 		  }
 		  ++totaljets;
+                  HT += jet->pt();
 		}
 	      }
             }
             tp_probe_jetDeltaR_->push_back(  dRjet_probe_min );
             tp_probe_totJets_->push_back(  totaljets);
+            tp_probe_HT_->push_back(  HT);
 	 }	 
 	 ++nrtp;
       }
@@ -1011,6 +1041,9 @@ TagProbeEDMNtuple::fillTagProbeInfo()
    m_event->put( tp_probe_phiDet_, "TPProbephiDet" ); 
    m_event->put( tp_probe_jetDeltaR_, "TPProbejetDeltaR" ); 
    m_event->put( tp_probe_totJets_, "TPProbetotJets" );
+   m_event->put( tp_probe_MET_, "TPProbeMET" );
+   m_event->put( tp_probe_sumET_, "TPProbesumET" );
+   m_event->put( tp_probe_HT_, "TPProbeHT" );
 }
 // ******************************************************************* //
 
