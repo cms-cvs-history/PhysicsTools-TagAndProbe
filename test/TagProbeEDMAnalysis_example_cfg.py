@@ -11,7 +11,7 @@ process.source = cms.Source("PoolSource",
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
 )
-process.demo = cms.EDFilter("TagProbeEDMAnalysis",
+process.demo = cms.EDAnalyzer("TagProbeEDMAnalysis",
     # Efficiency/Fitting variables
     CalculateEffSideBand = cms.untracked.bool(True),
     NameVar2 = cms.untracked.string('eta'),
