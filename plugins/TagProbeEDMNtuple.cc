@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Mon May  5 08:47:29 CDT 2008
-// $Id: TagProbeEDMNtuple.cc,v 1.15.8.2.2.2 2009/12/29 23:25:36 kalanand Exp $
+// $Id: TagProbeEDMNtuple.cc,v 1.15.8.2.2.3 2010/02/12 21:44:55 kalanand Exp $
 //
 //
 // Kalanand Mishra: October 7, 2008 
@@ -694,25 +694,26 @@ TagProbeEDMNtuple::fillTagProbeInfo()
    m_event->getByLabel(triggerEventTag_,trgEvent);
 
    // Add MET and sumET
-   
    double mMETnoHF;
    double mSumETnoHF;
 
-   edm::Handle< reco::CaloMETCollection> metNoHF;
-   m_event->getByLabel(metTags_,metNoHF);
-   if (metNoHF->size() == 0)
-     {
-       mMETnoHF   = -1;
-       mSumETnoHF = -1;
-     }
-   else
-     {
-       mMETnoHF   = (*metNoHF)[0].et();
-       mSumETnoHF = (*metNoHF)[0].sumEt();
-     }
-
-   tp_probe_MET_->push_back(  mMETnoHF );
-   tp_probe_sumET_->push_back( mSumETnoHF );
+   if ( !metTags_.empty() ) {
+     edm::Handle< reco::CaloMETCollection> metNoHF;
+     m_event->getByLabel(metTags_,metNoHF);
+     if (metNoHF->size() == 0)
+       {
+	 mMETnoHF   = -1;
+	 mSumETnoHF = -1;
+       }
+     else
+       {
+	 mMETnoHF   = (*metNoHF)[0].et();
+	 mSumETnoHF = (*metNoHF)[0].sumEt();
+       }
+     
+     tp_probe_MET_->push_back(  mMETnoHF );
+     tp_probe_sumET_->push_back( mSumETnoHF );
+   }
 
    // Fill some information about the tag & probe collections
    int nrtp = 0;

@@ -49,7 +49,7 @@ GenericElectronSelection::GenericElectronSelection(const edm::ParameterSet &para
   triggerSummaryLabel_ = 
     params.getUntrackedParameter<edm::InputTag>("triggerSummaryLabel",  dSummaryObj );
 
-  const edm::InputTag dHLTTag("HLT_Ele15_LW_L1R", "","HLT8E29");
+  const edm::InputTag dHLTTag("HLT_Ele15_LW_L1R", "","HLT");
   hltTag_ = params.getUntrackedParameter<edm::InputTag>("hltTag",dHLTTag);
   
 

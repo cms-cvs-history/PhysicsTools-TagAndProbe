@@ -158,7 +158,8 @@ theId = cms.EDProducer("eidCandProducer",
 theHLT = cms.EDProducer("eTriggerGsfElectronCollection",
     InputProducer = cms.InputTag('theId'),
     hltTag = cms.untracked.InputTag("HLT_Ele15_SW_LooseTrackIso_L1R","","HLT"),
-    triggerEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD","","HLT")
+    triggerEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD","","HLT"),
+    isTriggerFilter = cms.untracked.bool(True)                     
 )
 
 electron_sequence = cms.Sequence(theGsfElectrons*

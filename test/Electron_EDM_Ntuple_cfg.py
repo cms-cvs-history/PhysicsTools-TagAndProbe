@@ -11,21 +11,24 @@ process.load("Geometry.CaloEventSetup.CaloTopology_cfi")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 #process.GlobalTag.globaltag = cms.string('IDEAL_V11::All')
 #process.GlobalTag.globaltag = cms.string('CRAFT_30X::All')
-#process.GlobalTag.globaltag = "STARTUP_V7::All"
-process.GlobalTag.globaltag = cms.string('MC_31X_V3::All')
+process.GlobalTag.globaltag = cms.string('STARTUP3X_V14::All')
 process.load("PhysicsTools.TagAndProbe.tag_probe_electron_cfi")
 
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('/store/mc/Summer09/Zee/GEN-SIM-RECO/MC_31X_V3_SD_Ele15-v1/0003/C62D4337-F1AB-DE11-A96B-0018F3D0970E.root')
-)
+    fileNames = cms.untracked.vstring(
+    '/store/relval/CMSSW_3_4_2/RelValZEE/GEN-SIM-RECO/STARTUP3X_V15-v1/0011/F8FD7DD4-7213-DF11-A643-00304867904E.root',
+            '/store/relval/CMSSW_3_4_2/RelValZEE/GEN-SIM-RECO/STARTUP3X_V15-v1/0011/D8949A6A-7113-DF11-9C6E-00261894387D.root',
+            '/store/relval/CMSSW_3_4_2/RelValZEE/GEN-SIM-RECO/STARTUP3X_V15-v1/0011/7A446A3B-7013-DF11-8398-002618943935.root',
+            '/store/relval/CMSSW_3_4_2/RelValZEE/GEN-SIM-RECO/STARTUP3X_V15-v1/0011/5E77B148-B413-DF11-8ABB-003048678FB4.root',
+            '/store/relval/CMSSW_3_4_2/RelValZEE/GEN-SIM-RECO/STARTUP3X_V15-v1/0011/40902DE2-7113-DF11-9A52-003048678A7E.root'))
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
 )
 
 process.MessageLogger.destinations = ['cout', 'cerr']
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
 
 
