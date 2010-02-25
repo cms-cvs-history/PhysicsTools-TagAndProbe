@@ -1,9 +1,14 @@
 import FWCore.ParameterSet.Config as cms
 process = cms.Process("Fit")
 
+
 # Add your own files here
 process.source = cms.Source("EmptySource")
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) )    
+process.load('FWCore.MessageService.MessageLogger_cfi')
+process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
+
 
 process.RunFit = cms.EDAnalyzer("TagProbeEDMAnalysis",  
       ## Efficiency/Fitting variables
@@ -43,36 +48,36 @@ process.RunFit = cms.EDAnalyzer("TagProbeEDMAnalysis",
       ## If the variable should be fixed, fill one element {value}
       ## Signal variables
       ZLineShape = cms.untracked.PSet(
-        ZMean        = cms.untracked.vdouble( 91.1876, 90, 92),
-        ZWidth       = cms.untracked.vdouble( 2.495,   1.5, 10.0 ),
-        ZSigma       = cms.untracked.vdouble( 0.75,    0.1, 5.0 ),
-        ZWidthL      = cms.untracked.vdouble( 15.0,    1,   30.0 ),
-        ZWidthR      = cms.untracked.vdouble( 4.0,     1, 15.0 ),
-        ZBifurGaussFrac    = cms.untracked.vdouble( 0.10, 0.0, 1.0 )
+        ZMean        = cms.untracked.vdouble( 91.1876, 90., 92.4),
+        ZWidth       = cms.untracked.vdouble( 2.495,   1., 5. ),
+        ZSigma       = cms.untracked.vdouble( 1.,      0., 5. ),
+        ZWidthL      = cms.untracked.vdouble( 4.0,     0., 20.0 ),
+        ZWidthR      = cms.untracked.vdouble( 4.0,     0., 20.0 ),
+        ZBifurGaussFrac    = cms.untracked.vdouble( 0.2, 0.0, 0.5 )
       ),
 
       ## Background variables
       CMSBkgLineShape = cms.untracked.PSet(
-        CMSBkgAlpha           = cms.untracked.vdouble( 62., 50, 70 ),
-        CMSBkgBeta            = cms.untracked.vdouble( 0.001, 0.0, 0.1 ),
+        CMSBkgAlpha           = cms.untracked.vdouble( 0.1, 0., 1. ),
+        CMSBkgBeta            = cms.untracked.vdouble( 0.1, 0., 1. ),
         CMSBkgPeak            = cms.untracked.vdouble( 91.1876 ),
-        CMSBkgGamma           = cms.untracked.vdouble( 0.05,0.0, 0.1 )
+        CMSBkgGamma           = cms.untracked.vdouble( 0.1,  0., 1. )
       ),
 
       ## Efficiency variables
-      Efficiency        = cms.untracked.vdouble( 0.90,0.0,1.0 ),    
-      NumSignal         = cms.untracked.vdouble( 4000.0,-10.0,1000000.0 ),    
-      NumBkgPass        = cms.untracked.vdouble( 4000.0,-10.0,1000000.0 ),    
-      NumBkgFail        = cms.untracked.vdouble( 1000.0,-10.0,1000000.0  ),    
+      Efficiency        = cms.untracked.vdouble( 0.9, 0., 1. ),    
+      NumSignal         = cms.untracked.vdouble( 4000., -20., 1000000.0 ),    
+      NumBkgPass        = cms.untracked.vdouble( 4000., -20., 1000000.0 ),    
+      NumBkgFail        = cms.untracked.vdouble( 1000., -20., 1000000.0  ),    
 
       ## Variables for sideband subtraction
       SBSPeak            = cms.untracked.double( 91.18 ),   ## Mass peak
-      SBSStanDev         = cms.untracked.double(  5.0 ),      ## SD from peak for subtraction
+      SBSStanDev         = cms.untracked.double(  0.03 ),      ## SD/10 from peak for subtraction
 
       # All the following is useless now that we just read and fit
       # but it's required...
       # --------------------------------------------
-      MCTruthParentId = cms.untracked.int32(22),
+      MCTruthParentId = cms.untracked.int32(23),
 )
 
 process.p = cms.Path(process.RunFit)
