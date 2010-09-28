@@ -116,7 +116,7 @@ string TagProbeFitter::calculateEfficiency(string dirName, string effCat, string
     TString name = v->first;
     categories.addClone(variables[name]);
     mappedCategories.addClone(RooMappedCategory(name+"_bins", name+"_bins", (RooCategory&)categories[name]));
-    for(uint i = 0; i<v->second.size(); i++){
+    for(unsigned int i = 0; i<v->second.size(); i++){
       ((RooMappedCategory&)mappedCategories[name+"_bins"]).map(v->second[i].c_str(), name+"_"+TString(v->second[i].c_str()).ReplaceAll(",","_"));
     }
   }
@@ -132,7 +132,7 @@ string TagProbeFitter::calculateEfficiency(string dirName, string effCat, string
   data.addColumn( efficiencyCategory );
   //setup the pdf category
   RooMappedCategory pdfCategory("_pdfCategory_", "_pdfCategory_", allCats, (binToPDFmap.size()>0)?binToPDFmap[0].c_str():"");
-  for(uint i = 1; i<binToPDFmap.size(); i+=2){
+  for(unsigned int i = 1; i<binToPDFmap.size(); i+=2){
     pdfCategory.map(binToPDFmap[i].c_str(), binToPDFmap[i+1].c_str());
   }
   data.addColumn( pdfCategory );
@@ -346,7 +346,7 @@ void TagProbeFitter::doFitEfficiency(RooWorkspace* w, string pdfName, RooRealVar
 
 void TagProbeFitter::createPdf(RooWorkspace* w, vector<string>& pdfCommands){
   // create the signal and background pdfs defined by the user
-  for(uint i=0; i<pdfCommands.size(); i++){
+  for(unsigned int i=0; i<pdfCommands.size(); i++){
     w->factory(pdfCommands[i].c_str());
   }
   // setup the simultaneous extended pdf
@@ -456,7 +456,7 @@ void TagProbeFitter::saveDistributionsPlot(RooWorkspace* w){
   TCanvas canvas("distributions_canvas");
   canvas.Divide(3,reals.size());
   vector<RooPlot*> frames;
-  for(uint i=0; i<reals.size(); i++){
+  for(unsigned int i=0; i<reals.size(); i++){
     // plot the Passing Probes
     canvas.cd(3*i+1);
     frames.push_back(reals[i]->frame(Name("Passing"), Title("Passing Probes"), Bins(100)));
