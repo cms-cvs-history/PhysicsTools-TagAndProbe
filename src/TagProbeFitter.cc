@@ -39,9 +39,10 @@
 #include "RooMsgService.h"
 #include "Math/QuantFuncMathCore.h"
 
+using namespace std;
 using namespace RooFit;
 
-TagProbeFitter::TagProbeFitter(vector<string> inputFileNames, string inputDirectoryName, string inputTreeName, string outputFileName, int numCPU_, bool saveWorkspace_, bool floatShapeParameters_, std::vector<std::string> fixVars_){
+TagProbeFitter::TagProbeFitter(std::vector<std::string> inputFileNames, string inputDirectoryName, string inputTreeName, string outputFileName, int numCPU_, bool saveWorkspace_, bool floatShapeParameters_, std::vector<std::string> fixVars_){
   inputTree = new TChain((inputDirectoryName+"/"+inputTreeName).c_str());
   for(size_t i=0; i<inputFileNames.size(); i++){
     inputTree->Add(inputFileNames[i].c_str());
@@ -122,7 +123,7 @@ void TagProbeFitter::setWeightVar(const std::string &var) {
   weightVar = var;
 }
 
-string TagProbeFitter::calculateEfficiency(string dirName, vector<string> effCats, vector<string> effStates, vector<string>& unbinnedVariables, map<string, vector<double> >& binnedReals, map<string, std::vector<string> >& binnedCategories, vector<string>& binToPDFmap, bool saveWorkspace){
+string TagProbeFitter::calculateEfficiency(string dirName, vector<string> effCats, vector<string> effStates, vector<string>& unbinnedVariables, map<string, vector<double> >& binnedReals, map<string, std::vector<string> >& binnedCategories, vector<string>& binToPDFmap){
   //go to home directory
   outputDirectory->cd();
   //make a directory corresponding to this efficiency binning
