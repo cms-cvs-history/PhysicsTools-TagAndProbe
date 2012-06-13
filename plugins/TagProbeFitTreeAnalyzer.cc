@@ -8,6 +8,7 @@
 
 #include "PhysicsTools/TagAndProbe/interface/TagProbeFitter.h"
 
+using namespace std;
 using namespace edm;
 
 class TagProbeFitTreeAnalyzer : public edm::EDAnalyzer{
@@ -160,7 +161,7 @@ void TagProbeFitTreeAnalyzer::calculateEfficiency(string name, const edm::Parame
     effStates.push_back(effCatState[2*i+1]);
   }
 
-  fitter.calculateEfficiency(name, effCats, effStates, unbinnedVariables, binnedVariables, mappedCategories, binToPDFmap, true);
+  fitter.calculateEfficiency(name, effCats, effStates, unbinnedVariables, binnedVariables, mappedCategories, binToPDFmap);
 }
 
 //define this as a plug-in
