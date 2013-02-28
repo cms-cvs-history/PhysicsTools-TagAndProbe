@@ -28,9 +28,9 @@ class TriggerCandProducer : public edm::EDProducer
   ~TriggerCandProducer();
 
  private:
-  virtual void beginRun(edm::Run& iRun, edm::EventSetup const& iSetup);
+  virtual void beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup) override;
   virtual void beginJob() ;
-  virtual void produce(edm::Event&, const edm::EventSetup&);
+  virtual void produce(edm::Event&, const edm::EventSetup&) override;
   virtual void endJob() ;
 
   // ----------member data --------------------------
