@@ -297,7 +297,7 @@ void TriggerCandProducer<object>::produce(edm::Event &event, const edm::EventSet
 
 // ---- method called once each job just before starting event loop  ---
 template<class object>
-void TriggerCandProducer<object>::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup){
+void TriggerCandProducer<object>::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup){
 
   //verify that the process names of all the requested HLT paths are identical
   skipEvent_ = false;
