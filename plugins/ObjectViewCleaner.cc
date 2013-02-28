@@ -18,7 +18,6 @@
  * History:
  *   Generalized the existing CandViewCleaner
  *
- * Copyright (C) 2010 FNAL 
  *****************************************************************************/
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
@@ -59,7 +58,7 @@ public:
   virtual ~ObjectViewCleaner();
   
   // member functions
-  void produce(edm::Event& iEvent,const edm::EventSetup& iSetup);
+  void produce(edm::Event& iEvent,const edm::EventSetup& iSetup) override;
   void endJob();
 
 private:  
